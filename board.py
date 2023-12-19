@@ -1,5 +1,3 @@
-import time
-
 def guess_what_user_meant(number: int, possible_numbers: list):
     guess = 0
     i = 0
@@ -17,20 +15,34 @@ def calc_terminal_board_size(no_of_sqr: int):
     return (15 + (12 * no_of_sqr - 1), (15 + (12 * no_of_sqr - 1)) * 2)
 
 
-def append_display_v2(str_to_print: list, size: tuple, number_to_print: int, coordinates: list, return_list: list):
-    if (len(coordinates) != number_to_print):
-        raise ValueError("give the righ ammount of coordinates")
-    for item in range(number_to_print):
-        temp_pos = list(coordinates[item])
-        for row in str_to_print:
-            if temp_pos[0] > size[0] or temp_pos[1] > size[1]:
-                raise ValueError("Outside of bounds")
-            for char in row:
-                if (char != ' '):
-                    return_list[temp_pos[1]][temp_pos[0]] = char
-                temp_pos[0] += 1
-            temp_pos[1] += 1
-            temp_pos[0] = coordinates[item][0]
+def append_display_v2(graphics_dict: dict, size: tuple, board_to_print: dict, return_list: list):
+    # if (len(coordinates) != number_to_print):
+    #     raise ValueError("give the righ ammount of coordinates")
+    indv_items_to_print = list(board_to_print.keys())
+    for item in indv_items_to_print:
+        for position in board_to_print[item]:
+            temp_pos = list(position)
+            for row in graphics_dict[item]:
+                if temp_pos[0] > size[0] or temp_pos[1] > size[1]:
+                    raise ValueError("Outside of bounds")
+                for char in row:
+                    if (char != " "):
+                        return_list[temp_pos[1]][temp_pos[0]] = char
+                    temp_pos[0] += 1
+                temp_pos[1] += 1
+                temp_pos[0] = position[0]
+
+    # for item in range(number_to_print):
+    #     temp_pos = list(coordinates[item])
+    #     for row in str_to_print:
+    #         if temp_pos[0] > size[0] or temp_pos[1] > size[1]:
+    #             raise ValueError("Outside of bounds")
+    #         for char in row:
+    #             if (char != ' '):
+    #                 return_list[temp_pos[1]][temp_pos[0]] = char
+    #             temp_pos[0] += 1
+    #         temp_pos[1] += 1
+    #         temp_pos[0] = coordinates[item][0]
 
 
 def append_display(str_to_print: list, size: tuple, vals: tuple, return_list: list, directions: list):
@@ -110,65 +122,50 @@ def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size
             "diagonal_r_l": [(17, 2),
                              (5, 8)]
             }
-        dot_list = [(0, 0), (12, 0), (24, 0),
-                    (0, 6), (12, 6), (24, 6),
-                    (0, 12), (12, 12), (24, 12)]
 
-        horizontal_line_list = [(6, 1), (18, 1),
-                                (6, 7), (18, 7),
-                                (6, 13), (18, 13)]
-
-        vertical_line_list = [(2, 3), (14, 3), (26, 3),
-                              (2, 9), (14, 9), (26, 9)]
-
-        diagonal_left_to_right_list = [(5, 2),
-                                       (17, 8)]
-
-        diagonal_right_to_left_list = [(17, 2),
-                                       (5, 8)]
-
-        append_display_v2(str_dot, (x_size, y_size), 9, dot_list, return_list)
-        append_display_v2(horizontal_line, (x_size, y_size), 6, horizontal_line_list, return_list)
-        append_display_v2(vertical_line, (x_size, y_size), 6, vertical_line_list, return_list)
-        append_display_v2(diagonal_left_to_right, (x_size, y_size), 2, diagonal_left_to_right_list, return_list)
-        append_display_v2(diagonal_right_to_left, (x_size, y_size), 2, diagonal_right_to_left_list, return_list)
+        append_display_v2(graphics_dict, (x_size, y_size), no_of_sqr_1_size_3_board, return_list)
+        # append_display_v2(horizontal_line, (x_size, y_size), 6, horizontal_line_list, return_list)
+        # append_display_v2(vertical_line, (x_size, y_size), 6, vertical_line_list, return_list)
+        # append_display_v2(diagonal_left_to_right, (x_size, y_size), 2, diagonal_left_to_right_list, return_list)
+        # append_display_v2(diagonal_right_to_left, (x_size, y_size), 2, diagonal_right_to_left_list, return_list)
 
         
     elif (no_of_sqr == 2):
-        current_position = [0, 0]
-        append_display(str_dot, (x_size, y_size), (6, current_position, [24, 24]), return_list, [False, True])
+        pass
+        # current_position = [0, 0]
+        # append_display(str_dot, (x_size, y_size), (6, current_position, [24, 24]), return_list, [False, True])
 
-        current_position = [12, 6]
-        append_display(str_dot, (42, y_size), (6, current_position, [12, 12]), return_list, [False, True])
+        # current_position = [12, 6]
+        # append_display(str_dot, (42, y_size), (6, current_position, [12, 12]), return_list, [False, True])
 
-        current_position = [0, 12]
-        str_added_01 = []
-        for row in str_dot:
-            if (str_dot.index(row) == 1):
-                str_added_01.append(row + horizontal_line[0] + row)
-            else:
-                str_added_01.append(row + ' ' * len(horizontal_line[0]) + row)
-        append_display(str_added_01, (x_size, y_size), (2, current_position, [36, 0]), return_list, [False, True])
+        # current_position = [0, 12]
+        # str_added_01 = []
+        # for row in str_dot:
+        #     if (str_dot.index(row) == 1):
+        #         str_added_01.append(row + horizontal_line[0] + row)
+        #     else:
+        #         str_added_01.append(row + ' ' * len(horizontal_line[0]) + row)
+        # append_display(str_added_01, (x_size, y_size), (2, current_position, [36, 0]), return_list, [False, True])
 
-        current_position = [6, 1]
-        str_added_02 = [horizontal_line[0] * 3]
-        append_display(str_added_02, (x_size, y_size), (4, current_position, [24, 24]), return_list, [False, True])
+        # current_position = [6, 1]
+        # str_added_02 = [horizontal_line[0] * 3]
+        # append_display(str_added_02, (x_size, y_size), (4, current_position, [24, 24]), return_list, [False, True])
 
-        current_position = [18, 7]
-        str_added_03 = [horizontal_line[0] * 2]
-        append_display(horizontal_line, (42, y_size), (4, current_position, [12, 12]), return_list, [False, True])
+        # current_position = [18, 7]
+        # str_added_03 = [horizontal_line[0] * 2]
+        # append_display(horizontal_line, (42, y_size), (4, current_position, [12, 12]), return_list, [False, True])
 
-        current_position = [14, 9]
-        append_display(vertical_line, (42, y_size), (4, current_position, [24, 6]), return_list, [False, True])
+        # current_position = [14, 9]
+        # append_display(vertical_line, (42, y_size), (4, current_position, [24, 6]), return_list, [False, True])
 
-        current_position = [2, 3]
-        str_added_04 = []
-        for i in range(9):
-            str_added_04.append(vertical_line[0])
-        append_display(str_added_04, (x_size, y_size), (4, current_position, [48, 12]), return_list, [False, True])
+        # current_position = [2, 3]
+        # str_added_04 = []
+        # for i in range(9):
+        #     str_added_04.append(vertical_line[0])
+        # append_display(str_added_04, (x_size, y_size), (4, current_position, [48, 12]), return_list, [False, True])
 
-        current_position = [26, 3]
-        append_display(vertical_line, (32, y_size), (2, current_position, [10, 18]), return_list, [False, True])
+        # current_position = [26, 3]
+        # append_display(vertical_line, (32, y_size), (2, current_position, [10, 18]), return_list, [False, True])
     return return_list
 
 list1 = build_board(True, 1, 9, (30, 15))
