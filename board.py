@@ -15,15 +15,16 @@ def calc_terminal_board_size(no_of_sqr: int):
     return (15 + (12 * no_of_sqr - 1), (15 + (12 * no_of_sqr - 1)) * 2)
 
 
-def append_display_v2(graphics_dict: dict, size: tuple, board_to_print: dict, return_list: list):
-    # if (len(coordinates) != number_to_print):
-    #     raise ValueError("give the righ ammount of coordinates")
+def over_write_display(graphics_dict: dict, size: tuple, board_to_print: dict, return_list: list):
     indv_items_to_print = list(board_to_print.keys())
     for item in indv_items_to_print:
         for position in board_to_print[item]:
             temp_pos = list(position)
             for row in graphics_dict[item]:
-                if temp_pos[0] > size[0] or temp_pos[1] > size[1]:
+                if (temp_pos[0] > size[0]
+                   or temp_pos[0] < 0
+                   or temp_pos[1] > size[1]
+                   or temp_pos[1] < 0):
                     raise ValueError("Outside of bounds")
                 for char in row:
                     if (char != " "):
@@ -32,46 +33,15 @@ def append_display_v2(graphics_dict: dict, size: tuple, board_to_print: dict, re
                 temp_pos[1] += 1
                 temp_pos[0] = position[0]
 
-    # for item in range(number_to_print):
-    #     temp_pos = list(coordinates[item])
-    #     for row in str_to_print:
-    #         if temp_pos[0] > size[0] or temp_pos[1] > size[1]:
-    #             raise ValueError("Outside of bounds")
-    #         for char in row:
-    #             if (char != ' '):
-    #                 return_list[temp_pos[1]][temp_pos[0]] = char
-    #             temp_pos[0] += 1
-    #         temp_pos[1] += 1
-    #         temp_pos[0] = coordinates[item][0]
 
-
-def append_display(str_to_print: list, size: tuple, vals: tuple, return_list: list, directions: list):
-    '''
-    vals = (no_of_items_to_print, start_position, print_finish_skip)
-    start_position = [start_x, start_y]
-    print_finish_skip = [x_skip, y_skip]
-    size = (x_size, y_size)
-    directions = (is_diagonal, is_going_up)
-    '''
-    start_x = vals[1][0]
-    for item_to_print in range(vals[0]):
-        if (vals[1][0] > (size[0] - 1)):
-            vals[1][0] = start_x
-            vals[1][1] += vals[2][1]
-        temp_pos = list(vals[1])
-        for row in str_to_print:
-            for char in row:
-                if (char != ' '):
-                    return_list[temp_pos[1]][temp_pos[0]] = char
-                temp_pos[0] += 1
-            if (directions[1] is True):
-                temp_pos[1] += 1
-            elif (directions[1] is False):
-                temp_pos[1] -= 1
-            temp_pos[0] = vals[1][0]
-        vals[1][0] += vals[2][0]
-        if (directions[0] is True):
-            vals[1][1] += vals[2][1]
+def create_board_display_list(terminal_size: tuple):
+    return_list = []
+    for row in range(terminal_size[1]):
+        _ = []
+        for char in range(terminal_size[0]):
+            _.append(' ')
+        return_list.append(_)
+    return return_list
 
 
 def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size: tuple):
@@ -94,42 +64,32 @@ def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size
                          ' ▄▀      ',
                          '▀        ']
         }
+    no_of_sqr_1_size_3_board = {
+        "dot": [(0, 0), (12, 0), (24, 0),
+                (0, 6), (12, 6), (24, 6),
+                (0, 12), (12, 12), (24, 12)],
 
-    x_size, y_size = terminal_size
-    return_list = []
-    for row in range(y_size):
-        _ = []
-        for char in range(x_size):
-            _.append(' ')
-        return_list.append(_)
+        "horizontal_line": [(6, 1), (18, 1),
+                            (6, 7), (18, 7),
+                            (6, 13), (18, 13)],
 
+        "vertical_line": [(2, 3), (14, 3), (26, 3),
+                          (2, 9), (14, 9), (26, 9)],
+
+        "diagonal_l_r": [(5, 2),
+                         (17, 8)],
+
+        "diagonal_r_l": [(17, 2),
+                         (5, 8)]
+        }
+    board_display_list = create_board_display_list(terminal_size=terminal_size)
     if (no_of_sqr == 1):
-        no_of_sqr_1_size_3_board = {
-            "dot": [(0, 0), (12, 0), (24, 0),
-                    (0, 6), (12, 6), (24, 6),
-                    (0, 12), (12, 12), (24, 12)],
+        over_write_display(graphics_dict,
+                           terminal_size,
+                           no_of_sqr_1_size_3_board,
+                           board_display_list)
 
-            "horizontal_line": [(6, 1), (18, 1),
-                                (6, 7), (18, 7),
-                                (6, 13), (18, 13)],
 
-            "vertical_line": [(2, 3), (14, 3), (26, 3),
-                              (2, 9), (14, 9), (26, 9)],
-
-            "diagonal_l_r": [(5, 2),
-                             (17, 8)],
-
-            "diagonal_r_l": [(17, 2),
-                             (5, 8)]
-            }
-
-        append_display_v2(graphics_dict, (x_size, y_size), no_of_sqr_1_size_3_board, return_list)
-        # append_display_v2(horizontal_line, (x_size, y_size), 6, horizontal_line_list, return_list)
-        # append_display_v2(vertical_line, (x_size, y_size), 6, vertical_line_list, return_list)
-        # append_display_v2(diagonal_left_to_right, (x_size, y_size), 2, diagonal_left_to_right_list, return_list)
-        # append_display_v2(diagonal_right_to_left, (x_size, y_size), 2, diagonal_right_to_left_list, return_list)
-
-        
     elif (no_of_sqr == 2):
         pass
         # current_position = [0, 0]
@@ -166,7 +126,7 @@ def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size
 
         # current_position = [26, 3]
         # append_display(vertical_line, (32, y_size), (2, current_position, [10, 18]), return_list, [False, True])
-    return return_list
+    return board_display_list
 
 list1 = build_board(True, 1, 9, (30, 15))
 for row in list1:
