@@ -64,50 +64,25 @@ def append_display(str_to_print: list, size: tuple, vals: tuple, return_list: li
 
 def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size: tuple):
     graphics_dict = {
-                     "dot": [' ▄██▄ ',
-                             '▐████▌',
-                             ' ▀██▀ '],
-                     "horizontal_line": ['══════'],
-                     "vertical_line": ['││',
-                                       '││',
-                                       '││'],
-                     "diagonal_l_r": ['▄       ',
-                                      ' ▀▄     ',
-                                      '   ▀▄   ',
-                                      '     ▀▄ ',
-                                      '       ▀'],
-                     "diagonal_r_l": ['       ▄▀',
-                                      '     ▄▀  ',
-                                      '   ▄▀    ',
-                                      ' ▄▀      ',
-                                      '▀        ']
-                    }
+        "dot": [' ▄██▄ ',
+                '▐████▌',
+                ' ▀██▀ '],
+        "horizontal_line": ['══════'],
+        "vertical_line": ['││',
+                          '││',
+                          '││'],
+        "diagonal_l_r": ['▄       ',
+                         ' ▀▄     ',
+                         '   ▀▄   ',
+                         '     ▀▄ ',
+                         '       ▀'],
+        "diagonal_r_l": ['       ▄▀',
+                         '     ▄▀  ',
+                         '   ▄▀    ',
+                         ' ▄▀      ',
+                         '▀        ']
+        }
 
-    str_dot = [
-        ' ▄██▄ ',
-        '▐████▌',
-        ' ▀██▀ '
-    ]
-    horizontal_line = ['══════']
-    vertical_line = [
-        '││',
-        '││',
-        '││'
-    ]
-    diagonal_left_to_right = [
-        '▄       ',
-        ' ▀▄     ',
-        '   ▀▄   ',
-        '     ▀▄ ',
-        '       ▀'
-    ]
-    diagonal_right_to_left = [
-        '       ▄▀',
-        '     ▄▀  ',
-        '   ▄▀    ',
-        ' ▄▀      ',
-        '▀        '
-    ]
     x_size, y_size = terminal_size
     return_list = []
     for row in range(y_size):
@@ -117,7 +92,24 @@ def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size
         return_list.append(_)
 
     if (no_of_sqr == 1):
-        no_of_sqr_1_size_3_board = {"str"}
+        no_of_sqr_1_size_3_board = {
+            "dot": [(0, 0), (12, 0), (24, 0),
+                    (0, 6), (12, 6), (24, 6),
+                    (0, 12), (12, 12), (24, 12)],
+
+            "horizontal_line": [(6, 1), (18, 1),
+                                (6, 7), (18, 7),
+                                (6, 13), (18, 13)],
+
+            "vertical_line": [(2, 3), (14, 3), (26, 3),
+                              (2, 9), (14, 9), (26, 9)],
+
+            "diagonal_l_r": [(5, 2),
+                             (17, 8)],
+
+            "diagonal_r_l": [(17, 2),
+                             (5, 8)]
+            }
         dot_list = [(0, 0), (12, 0), (24, 0),
                     (0, 6), (12, 6), (24, 6),
                     (0, 12), (12, 12), (24, 12)]
