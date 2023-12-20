@@ -1,4 +1,6 @@
 from board_data import BoardData
+import os
+from time import sleep
 
 
 def guess_what_user_meant(number: int, possible_numbers: list):
@@ -106,10 +108,19 @@ class Board:
     def display_list(self):
         return self._display_list
 
+
+os.system('cls' if os.name == 'nt' else 'clear')
 print(Board(3))
+sleep(3)
 
+os.system('cls' if os.name == 'nt' else 'clear')
 print(Board(6))
+sleep(4)
 
+os.system('cls' if os.name == 'nt' else 'clear')
 print(Board(9))
+sleep(5)
 
+os.system('cls' if os.name == 'nt' else 'clear')
 print(Board(12))
+sleep(10)
