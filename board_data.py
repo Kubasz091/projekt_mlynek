@@ -1,5 +1,5 @@
-class BoardInfo:
-    def __init__(self):
+class BoardData:
+    def __init__(self, diagonals: bool, no_of_sqr: int):
         graphics_dict = {
             "dot": [' ▄██▄ ',
                     '▐████▌',
@@ -18,7 +18,7 @@ class BoardInfo:
                              '   ▄▀    ',
                              ' ▄▀      ',
                              '▀        ']
-        }
+            }
         no_of_sqr_1_size_3_board = {
             "dot": [(0, 0), (12, 0), (24, 0),
                     (0, 6), (12, 6), (24, 6),
@@ -138,5 +138,22 @@ class BoardInfo:
                              (17, 26),
                              (5, 32)]
             }
+
         self._graphics_data = graphics_dict
-        
+        if (no_of_sqr == 1 and diagonals is True):
+            self._board_data = no_of_sqr_1_size_3_board
+        elif (no_of_sqr == 2 and diagonals is False):
+            self._board_data = no_of_sqr_2_size_6_board
+        elif (no_of_sqr == 3):
+            if (diagonals is False):
+                self._board_data = no_of_sqr_3_size_9_board
+            elif (diagonals is True):
+                self._board_data = no_of_sqr_3_size_12_board
+
+    @property
+    def board_data(self):
+        return self._board_data
+
+    @property
+    def graphics_data(self):
+        return self._graphics_data

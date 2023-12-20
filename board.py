@@ -1,3 +1,6 @@
+from board_data import BoardData
+
+
 def guess_what_user_meant(number: int, possible_numbers: list):
     guess = 0
     i = 0
@@ -12,7 +15,7 @@ def calc_terminal_board_size(no_of_sqr: int):
     '''
     returns (x, y) sizes in terminal characters
     '''
-    return (15 + (12 * no_of_sqr - 1), (15 + (12 * no_of_sqr - 1)) * 2)
+    return ((15 + (12 * (no_of_sqr - 1))) * 2, 15 + (12 * (no_of_sqr - 1)))
 
 
 def over_write_display(graphics_dict: dict, size: tuple, board_to_print: dict, return_list: list):
@@ -44,96 +47,16 @@ def create_board_display_list(terminal_size: tuple):
     return return_list
 
 
-def build_board(diagonals: bool, no_of_sqr: int, no_of_spots: int, terminal_size: tuple):
-    graphics_dict = {
-        "dot": [' ▄██▄ ',
-                '▐████▌',
-                ' ▀██▀ '],
-        "horizontal_line": ['══════'],
-        "vertical_line": ['││',
-                          '││',
-                          '││'],
-        "diagonal_l_r": ['▄       ',
-                         ' ▀▄     ',
-                         '   ▀▄   ',
-                         '     ▀▄ ',
-                         '       ▀'],
-        "diagonal_r_l": ['       ▄▀',
-                         '     ▄▀  ',
-                         '   ▄▀    ',
-                         ' ▄▀      ',
-                         '▀        ']
-        }
-    no_of_sqr_1_size_3_board = {
-        "dot": [(0, 0), (12, 0), (24, 0),
-                (0, 6), (12, 6), (24, 6),
-                (0, 12), (12, 12), (24, 12)],
-
-        "horizontal_line": [(6, 1), (18, 1),
-                            (6, 7), (18, 7),
-                            (6, 13), (18, 13)],
-
-        "vertical_line": [(2, 3), (14, 3), (26, 3),
-                          (2, 9), (14, 9), (26, 9)],
-
-        "diagonal_l_r": [(5, 2),
-                         (17, 8)],
-
-        "diagonal_r_l": [(17, 2),
-                         (5, 8)]
-        }
+def build_board(diagonals: bool, no_of_sqr: int, terminal_size: tuple):
     board_display_list = create_board_display_list(terminal_size=terminal_size)
-    if (no_of_sqr == 1):
-        over_write_display(graphics_dict,
-                           terminal_size,
-                           no_of_sqr_1_size_3_board,
-                           board_display_list)
+    board_Data = BoardData(diagonals=diagonals, no_of_sqr=no_of_sqr)
 
-
-    elif (no_of_sqr == 2):
-        pass
-        # current_position = [0, 0]
-        # append_display(str_dot, (x_size, y_size), (6, current_position, [24, 24]), return_list, [False, True])
-
-        # current_position = [12, 6]
-        # append_display(str_dot, (42, y_size), (6, current_position, [12, 12]), return_list, [False, True])
-
-        # current_position = [0, 12]
-        # str_added_01 = []
-        # for row in str_dot:
-        #     if (str_dot.index(row) == 1):
-        #         str_added_01.append(row + horizontal_line[0] + row)
-        #     else:
-        #         str_added_01.append(row + ' ' * len(horizontal_line[0]) + row)
-        # append_display(str_added_01, (x_size, y_size), (2, current_position, [36, 0]), return_list, [False, True])
-
-        # current_position = [6, 1]
-        # str_added_02 = [horizontal_line[0] * 3]
-        # append_display(str_added_02, (x_size, y_size), (4, current_position, [24, 24]), return_list, [False, True])
-
-        # current_position = [18, 7]
-        # str_added_03 = [horizontal_line[0] * 2]
-        # append_display(horizontal_line, (42, y_size), (4, current_position, [12, 12]), return_list, [False, True])
-
-        # current_position = [14, 9]
-        # append_display(vertical_line, (42, y_size), (4, current_position, [24, 6]), return_list, [False, True])
-
-        # current_position = [2, 3]
-        # str_added_04 = []
-        # for i in range(9):
-        #     str_added_04.append(vertical_line[0])
-        # append_display(str_added_04, (x_size, y_size), (4, current_position, [48, 12]), return_list, [False, True])
-
-        # current_position = [26, 3]
-        # append_display(vertical_line, (32, y_size), (2, current_position, [10, 18]), return_list, [False, True])
+    over_write_display(board_Data.graphics_data,
+                       terminal_size,
+                       board_Data.board_data,
+                       board_display_list)
     return board_display_list
 
-list1 = build_board(True, 1, 9, (30, 15))
-for row in list1:
-    _ = ''
-    for char in row:
-        _ += char
-    print(_)
 
 class WrongBoardSize(Exception):
     def __init__(self, number: int, possible_numbers: list):
@@ -151,6 +74,17 @@ class Board:
         self._no_of_sqr = [1, 2, 3, 3][self._possible_sizes.index(self._size)]
         self._no_of_spots = [9, 16, 24, 24][self._possible_sizes.index(self._size)]
         self._terminal_size = calc_terminal_board_size(self._no_of_sqr)
+        self._display_list = build_board(self._diagonals, self._no_of_sqr, self._terminal_size)
+
+    def __str__(self):
+        return_str = ''
+        for row in self._display_list:
+            _ = ''
+            for char in row:
+                _ += char
+            _ += '\n'
+            return_str += _
+        return return_str
 
     @property
     def size(self):
@@ -167,3 +101,15 @@ class Board:
     @property
     def terminal_size(self):
         return self._terminal_size
+
+    @property
+    def display_list(self):
+        return self._display_list
+
+print(Board(3))
+
+print(Board(6))
+
+print(Board(9))
+
+print(Board(12))
