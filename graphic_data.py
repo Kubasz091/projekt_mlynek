@@ -146,7 +146,7 @@ class GraphicData:
             }
 
         self._graphics_data = graphics_dict
-
+        self._size = size
         if size == 3:
             self._board_data = size_3_board
         elif size == 6:
@@ -163,3 +163,7 @@ class GraphicData:
     @property
     def graphics_data(self):
         return self._graphics_data
+
+    @property
+    def size(self):
+        return self._size
