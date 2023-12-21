@@ -14,13 +14,15 @@ def create_display_list(board_terminal_size: tuple):
     return return_list
 
 
-def build_board(diagonals: bool, no_of_sqr: int, board_terminal_size: tuple, graphic_data: GraphicData):
-    board_display_list = create_display_list(board_terminal_size=board_terminal_size)
+def build_board(board_terminal_size: tuple, graphic_data: GraphicData):
+
+    board_display_list = create_display_list(board_terminal_size)
 
     over_write_display(graphic_data.graphics_data,
                        board_terminal_size,
                        graphic_data.board_data,
                        board_display_list)
+
     return board_display_list
 
 
@@ -101,9 +103,8 @@ def create_full_display_list(board_display: list, size: int, graphic_data: Graph
 class Display:
     def __init__(self, board: Board):
         self._board = board
-        self._graphic_data = GraphicData(board.diagonals, board.number_of_squares)
-        self._board_display_list = build_board(board.diagonals, board.number_of_squares,
-                                               board.terminal_size, self._graphic_data)
+        self._graphic_data = GraphicData(board.size)
+        self._board_display_list = build_board(board.terminal_size, self._graphic_data)
         self._full_display_list, self._pawns_locations = create_full_display_list(self._board_display_list,
                                                                                   board.size, self._graphic_data)
 

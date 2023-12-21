@@ -1,5 +1,5 @@
 class GraphicData:
-    def __init__(self, diagonals: bool, no_of_sqr: int):
+    def __init__(self, size: int):
         graphics_dict = {
             "dot": [' ▄██▄ ',
                     '▐████▌',
@@ -25,7 +25,7 @@ class GraphicData:
                              ' ▄▀      ',
                              '▀        ']
             }
-        no_of_sqr_1_size_3_board = {
+        size_3_board = {
             "dot": [(0, 0), (12, 0), (24, 0),
                     (0, 6), (12, 6), (24, 6),
                     (0, 12), (12, 12), (24, 12)],
@@ -43,7 +43,7 @@ class GraphicData:
             "diagonal_r_l": [(17, 2),
                              (5, 8)]
             }
-        no_of_sqr_2_size_6_board = {
+        size_6_board = {
             "dot": [(0, 0), (24, 0), (48, 0),
                     (12, 6), (24, 6), (36, 6),
                     (0, 12), (12, 12), (36, 12), (48, 12),
@@ -63,7 +63,7 @@ class GraphicData:
                               (2, 18), (50, 18),
                               (2, 21), (26, 21), (50, 21)],
             }
-        no_of_sqr_3_size_9_board = {
+        size_9_board = {
             "dot": [(0, 0), (36, 0), (72, 0),
                     (12, 6), (36, 6), (60, 6),
                     (24, 12), (36, 12), (48, 12),
@@ -99,7 +99,7 @@ class GraphicData:
                               (2, 30), (74, 30),
                               (2, 33), (38, 33), (74, 33)],
             }
-        no_of_sqr_3_size_12_board = {
+        size_12_board = {
             "dot": [(0, 0), (36, 0), (72, 0),
                     (12, 6), (36, 6), (60, 6),
                     (24, 12), (36, 12), (48, 12),
@@ -146,15 +146,15 @@ class GraphicData:
             }
 
         self._graphics_data = graphics_dict
-        if (no_of_sqr == 1 and diagonals is True):
-            self._board_data = no_of_sqr_1_size_3_board
-        elif (no_of_sqr == 2 and diagonals is False):
-            self._board_data = no_of_sqr_2_size_6_board
-        elif (no_of_sqr == 3):
-            if (diagonals is False):
-                self._board_data = no_of_sqr_3_size_9_board
-            elif (diagonals is True):
-                self._board_data = no_of_sqr_3_size_12_board
+
+        if size == 3:
+            self._board_data = size_3_board
+        elif size == 6:
+            self._board_data = size_6_board
+        elif size == 9:
+            self._board_data = size_9_board
+        elif size == 12:
+            self._board_data = size_12_board
 
     @property
     def board_data(self):
