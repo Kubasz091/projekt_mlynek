@@ -169,6 +169,7 @@ def draw_display(stdscr):
     cursor_y = 0
     catch = False
     saved_pos = None
+    position_difference = None
     holding_pawn = None
 
     stdscr.clear()
@@ -191,20 +192,12 @@ def draw_display(stdscr):
             # keyboard functionality
             if k == curses.KEY_DOWN:
                 cursor_y = cursor_y + 1
-                if holding_pawn is not None:
-                    holding_pawn.set_position([holding_pawn.position[0], holding_pawn.position[1]+1]) # need to add a check if the pawn is not outside of display size already, or limit cursor movement so it can" go outside
             elif k == curses.KEY_UP:
                 cursor_y = cursor_y - 1
-                if holding_pawn is not None:
-                    holding_pawn.set_position([holding_pawn.position[0], holding_pawn.position[1]-1])
             elif k == curses.KEY_RIGHT:
                 cursor_x = cursor_x + 2
-                if holding_pawn is not None:
-                    holding_pawn.set_position([holding_pawn.position[0]+2, holding_pawn.position[1]])
             elif k == curses.KEY_LEFT:
                 cursor_x = cursor_x - 2
-                if holding_pawn is not None:
-                    holding_pawn.set_position([holding_pawn.position[0]-2, holding_pawn.position[1]])
             elif k == ord('e'):
                 catch = not catch
                 if (saved_pos is not None):
@@ -215,6 +208,9 @@ def draw_display(stdscr):
 
             cursor_y = max(0, cursor_y)
             cursor_y = min(height-2, cursor_y)
+
+            if catch is True and holding_pawn is not None:
+                holding_pawn.set_position([cursor_x-position_difference[0], cursor_y-position_difference[1]])
 
             statusbarstr = "Press 'q' to exit | Press 'e' to move pawns | Pos: {}, {}".format(int(cursor_x/2), cursor_y)
 
@@ -229,8 +225,8 @@ def draw_display(stdscr):
                 holding_pawn_text = f"{holding_pawn}"
             whstr = "holding_pawn: {}".format(holding_pawn_text)
             stdscr.addstr(0, 1, whstr)
-            stdscr.attron(curses.color_pair(2))
 
+            stdscr.attron(curses.color_pair(2))
             for pawn in display.player1_pawn_list:
                 pawn_str = display.pawn_str(pawn)
                 temp_pos = list(pawn.position)
@@ -263,6 +259,7 @@ def draw_display(stdscr):
                 if holding_pawn is not None:
                     holding_pawn = None
                     saved_pos = None
+                    position_difference = None
             elif (catch is True):
                 stdscr.attron(curses.color_pair(4))
                 stdscr.addstr(cursor_y, cursor_x, "██")
@@ -273,15 +270,25 @@ def draw_display(stdscr):
                         catch = not catch
                     elif (saved_pos is None):
                         saved_pos = list(holding_pawn.position)
+                        position_difference = list([cursor_x-saved_pos[0], cursor_y-saved_pos[1]])
 
             # Refresh the screen and move the cursor for rendering so it is not next to my pointer
             stdscr.move(height - 1, width - 1)
             stdscr.refresh()
 
-            # Wait for next input
             sleep(0.02)
+            if (catch is False and k == ord("e")):
+                stdscr.attron(curses.color_pair(1))
+                stdscr.addstr(cursor_y, cursor_x, "██")
+                stdscr.attroff(curses.color_pair(1))
+                stdscr.move(height - 1, width - 1)
+                stdscr.refresh()
+
+            # Wait for next input
             k = stdscr.getch()
-        else: # if terminal size is not big enough to fit the whole board notify the user
+
+        # if terminal size is not big enough to fit the whole board notify the user
+        else:
             x_message = width - len(baord_str[0])
             y_message = height - len(baord_str)
             x_message = min(0, x_message)
@@ -312,7 +319,7 @@ def draw_display(stdscr):
             stdscr.move(height - 1, width - 1)
 
             stdscr.refresh()
-            sleep(0.016)
+            sleep(0.02)
             k = stdscr.getch()
 
 if __name__ == "__main__":
