@@ -41,3 +41,19 @@ class Board:
     @property
     def terminal_size(self):
         return self._terminal_size
+
+
+class Pawn:
+    def __init__(self, position: list, player_no: int):
+        if (player_no not in [1, 2]):
+            raise ValueError("wrong player number given")
+        self._player_no = player_no
+        self._position = list(position)
+
+    @property
+    def player_no(self):
+        return self._player_no
+
+    @property
+    def position(self):
+        return self._position

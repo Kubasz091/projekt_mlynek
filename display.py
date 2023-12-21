@@ -1,4 +1,4 @@
-from board import Board
+from board import Board, Pawn
 from graphic_data import GraphicData
 from time import sleep
 import os
@@ -58,7 +58,6 @@ def create_full_display_list(graphic_data: GraphicData):
     x_display_size = board_width + (2 * single_player_panel_x_size)
     print((single_player_panel_x_size * 2) + board_width)
 
-    dict_pawn = {"pawn_player1": [], "pawn_player2": []}
     no_of_pawns_in_a_column = (graphic_data.size // pawn_columns)
     if (graphic_data.size % pawn_columns) != 0:
         no_of_pawns_in_a_column += 1
@@ -66,12 +65,15 @@ def create_full_display_list(graphic_data: GraphicData):
     start_y = int((board_height - (no_of_pawns_in_a_column * (pawn_height + 1))) / 2) + 1
     headline_x = x_display_size - (pawn_columns * (pawn_width + 2))
 
+    player1_pawns = []
+    player2_pawns = []
+
     temp_pos = [0, start_y]
     for pawn in range(graphic_data.size):
         if (temp_pos[0] > (single_player_panel_x_size - 1)):
             temp_pos[1] += pawn_height + 1
             temp_pos[0] = 0
-        dict_pawn["pawn_player1"].append((temp_pos[0], temp_pos[1]))
+        player1_pawns.append(Pawn(temp_pos, 1))
         temp_pos[0] += (pawn_width + 2)
 
     temp_pos = [x_display_size - (pawn_width + 2), start_y]
@@ -79,7 +81,7 @@ def create_full_display_list(graphic_data: GraphicData):
         if (temp_pos[0] < (x_display_size - single_player_panel_x_size - 1)):
             temp_pos[1] += pawn_height + 1
             temp_pos[0] = x_display_size - (pawn_width + 2)
-        dict_pawn["pawn_player2"].append((temp_pos[0], temp_pos[1]))
+        player2_pawns.append(Pawn(temp_pos, 2))
         temp_pos[0] -= (pawn_width + 2)
 
     display_dict = {}
@@ -91,10 +93,6 @@ def create_full_display_list(graphic_data: GraphicData):
             _.append((position[0] + (single_player_panel_x_size - 1), position[1]))
         display_dict[item] = _
 
-    pawn_items = dict_pawn.keys()
-    for item in pawn_items:
-        display_dict[item] = dict_pawn[item]
-
     return_list = create_display_list((x_display_size, board_height))
 
     print_miltiple_items(graphic_data.graphics_data, display_dict, return_list)
@@ -102,14 +100,21 @@ def create_full_display_list(graphic_data: GraphicData):
     print_item_in_coordinates(["Player 1", " pawns: "], (0, start_y-3), return_list)
     print_item_in_coordinates(["Player 2", " pawns: "], (headline_x, start_y-3), return_list)
 
-    return return_list, dict_pawn
+    return return_list, player1_pawns, player2_pawns
 
 
 class Display:
     def __init__(self, board: Board):
         self._board = board
         self._graphic_data = GraphicData(board.size)
-        self._display_list, self._pawns_locations = create_full_display_list(self._graphic_data)
+        self._display_list, pawns1, pawns2 = create_full_display_list(self._graphic_data)
+        self._pawns = [pawns1, pawns2]
+
+    def print_pawns(self):
+        for player in self._pawns:
+            for pawn in player:
+                print_item_in_coordinates(self._graphic_data.graphics_data[f'pawn_player{pawn.player_no}'],
+                tuple(pawn.position), self._display_list)
 
     def __str__(self):
         return_str = ''
@@ -123,17 +128,25 @@ class Display:
 
 
 os.system('cls' if os.name == 'nt' else 'clear')
-print(Display(Board(3)))
+display = Display(Board(3))
+display.print_pawns()
+print(display)
 sleep(3)
 
 os.system('cls' if os.name == 'nt' else 'clear')
-print(Display(Board(6)))
+display = Display(Board(6))
+display.print_pawns()
+print(display)
 sleep(4)
 
 os.system('cls' if os.name == 'nt' else 'clear')
-print(Display(Board(9)))
+display = Display(Board(9))
+display.print_pawns()
+print(display)
 sleep(5)
 
 os.system('cls' if os.name == 'nt' else 'clear')
-print(Display(Board(12)))
+display = Display(Board(12))
+display.print_pawns()
+print(display)
 sleep(10)
