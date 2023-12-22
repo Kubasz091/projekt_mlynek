@@ -51,7 +51,7 @@ class Pawn:
         self._position = list(position)
 
     def __str__(self):
-        return f'This is pawn of player {self._player_no}, at position: x:{self._position[0]}, y:{self._position[1]}'
+        return f'This is pawn of player {self._player_no}, at position: x:{int(self._position[0]/2)}, y:{self._position[1]}'
 
     def set_position(self, position: list):
         self._position = position
