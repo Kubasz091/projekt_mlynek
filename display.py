@@ -102,7 +102,7 @@ class Display:
             pawn_columns += 1
 
         single_player_panel_x_size = (pawn_width + 2) * pawn_columns
-        x_display_size = board_width + (2 * single_player_panel_x_size)
+        x_display_size = board_width + (2 * single_player_panel_x_size) + 2
 
         no_of_pawns_in_a_column = (self._graphic_data.size // pawn_columns)
         if (self._graphic_data.size % pawn_columns) != 0:
@@ -122,11 +122,11 @@ class Display:
             player1_pawns.append(Pawn(temp_pos, 1))
             temp_pos[0] += (pawn_width + 2)
 
-        temp_pos = [x_display_size - (pawn_width + 2), start_y]
+        temp_pos = [x_display_size - (pawn_width+2), start_y]
         for pawn in range(self._graphic_data.size):
             if (temp_pos[0] < (x_display_size - single_player_panel_x_size - 1)):
                 temp_pos[1] += pawn_height + 1
-                temp_pos[0] = x_display_size - (pawn_width + 2)
+                temp_pos[0] = x_display_size - (pawn_width+2)
             player2_pawns.append(Pawn(temp_pos, 2))
             temp_pos[0] -= (pawn_width + 2)
 
@@ -136,7 +136,7 @@ class Display:
         for item in board_items:
             _ = []
             for position in self._graphic_data.board_data[item]:
-                _.append((position[0] + (single_player_panel_x_size - 1), position[1]))
+                _.append((position[0] + (single_player_panel_x_size), position[1]))
             display_dict[item] = _
 
         return_list = self.create_display_list((x_display_size, board_height))
@@ -155,17 +155,17 @@ class Display:
         height, width = wrapper.getmaxyx()
         baord_str = self.board_str()
 
-        if (height >= len(baord_str) and width >= len(baord_str[0])):
+        if (height >= len(baord_str)+1 and width >= len(baord_str[0])):
             # keyboard functionality
-            if self._key == curses.KEY_DOWN:
+            if self._key == "KEY_DOWN":
                 self._cursor_y = self._cursor_y + 1
-            elif self._key == curses.KEY_UP:
+            elif self._key == "KEY_UP":
                 self._cursor_y = self._cursor_y - 1
-            elif self._key == curses.KEY_RIGHT:
+            elif self._key == "KEY_RIGHT":
                 self._cursor_x = self._cursor_x + 2
-            elif self._key == curses.KEY_LEFT:
+            elif self._key == "KEY_LEFT":
                 self._cursor_x = self._cursor_x - 2
-            elif self._key == ord('e'):
+            elif self._key == 'e':
                 self._catch = not self._catch
                 if (self._saved_pos is not None):
                     self._holding_pawn.set_position(self._saved_pos)
@@ -243,16 +243,12 @@ class Display:
             wrapper.move(height - 1, width - 1)
             wrapper.refresh()
 
-            sleep(0.02)
-            if (self._catch is False and self._key == ord("e")):
+            if (self._catch is False and self._key == "e"):
                 wrapper.attron(curses.color_pair(1))
                 wrapper.addstr(self._cursor_y, self._cursor_x, "██")
                 wrapper.attroff(curses.color_pair(1))
                 wrapper.move(height - 1, width - 1)
                 wrapper.refresh()
-
-            # Wait for next input
-            self._key = wrapper.getch()
 
         # if terminal size is not big enough to fit the whole board notify the user
         else:
@@ -286,8 +282,6 @@ class Display:
             wrapper.move(height - 1, width - 1)
 
             wrapper.refresh()
-            sleep(0.02)
-            self._key = wrapper.getch()
 
     def set_key(self, key):
         self._key = key
