@@ -1,10 +1,12 @@
 from display import Display
 import curses
 from time import sleep, time
+from game_lord import GameLord
 
 
 def main(wrapper):
-    display = Display(12)
+    game_lord = GameLord()
+    display = Display(12, game_lord)
 
     wrapper.nodelay(True)
 
@@ -12,11 +14,17 @@ def main(wrapper):
     display.draw_display(wrapper)
     wrapper.refresh()
 
+    time_started = time()
+    time_to_display = 0
+
     while (display.key != "q"):
         try:
-            key = wrapper.getkey()
-            display.set_key(key)
-            display.draw_display(wrapper)
+            current_time = time() - time_started
+            if (current_time > time_to_display):
+                key = wrapper.getkey()
+                display.set_key(key)
+                display.draw_display(wrapper)
+                time_to_display = current_time + 0.02
         except curses.error:
             pass
 

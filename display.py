@@ -1,7 +1,7 @@
-from board import Board, Pawn
+from board import Board, Pawn, Dot
 from graphic_data import GraphicData
-from time import sleep
 import curses
+from game_lord import GameLord
 
 
 class CoordinatesError(Exception):
@@ -10,13 +10,14 @@ class CoordinatesError(Exception):
 
 
 class Display:
-    def __init__(self, size: int):
+    def __init__(self, size: int, game_lord: GameLord):
         self._board = Board(size)
         self._graphic_data = GraphicData(size)
         self._display_list = []
-        self._display_list, pawns1, pawns2 = self.create_full_display_list()
+        self._display_list, self._dots_list, pawns1, pawns2 = self.create_full_display_list()
         self._player1_pawns = pawns1
         self._player2_pawns = pawns2
+        self._game_lord = game_lord
 
         # curses display values
         self._key = 0
@@ -26,6 +27,7 @@ class Display:
         self._saved_pos = None
         self._position_difference = None
         self._holding_pawn = None
+        self._saved_dot = None
 
         curses.start_color()
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
@@ -35,20 +37,33 @@ class Display:
         curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
     def pawn_str(self, pawn: Pawn):
-        return list(self._graphic_data.graphics_data[f'pawn_player{pawn.player_no}'])
+        return list(self._graphic_data.graphics_data[f'pawn_player{int(not pawn.player_no_1)}'])
 
     def check_if_above_pawn(self, position: list):
-        pawn_return = []
+        pawn_return = None
         for player in [self._player1_pawns, self._player2_pawns]:
             for pawn in player:
                 pos_left_corner = pawn.position
-                pos_right_corner = [pos_left_corner[0] + len(self._graphic_data.graphics_data[f'pawn_player{pawn.player_no}'][0]),
-                                    pos_left_corner[1] + len(self._graphic_data.graphics_data[f'pawn_player{pawn.player_no}'])]
+                pos_right_corner = [pos_left_corner[0] + len(self._graphic_data.graphics_data[f'pawn_player{int(not pawn.player_no_1)}'][0]),
+                                    pos_left_corner[1] + len(self._graphic_data.graphics_data[f'pawn_player{int(not pawn.player_no_1)}'])]
                 if (position[0] >= pos_left_corner[0] and position[0] < pos_right_corner[0]
-                   and position[1] >= pos_left_corner[1] and position[1] < pos_right_corner[1]):
-                    pawn_return.append(pawn)
-        if (len(pawn_return) != 0):
-            return pawn_return[0]
+                   and position[1] >= pos_left_corner[1] and position[1] < pos_right_corner[1]
+                   and pawn.player_no_1 == self._game_lord.player1_turn):
+                    pawn_return = pawn
+        if (pawn_return is not None):
+            return pawn_return
+
+    def check_if_above_dot(self):
+        dot_return = None
+        for dot in self._dots_list:
+            pos_left_corner = list(dot.position)
+            pos_right_corner = [pos_left_corner[0] + len(self._graphic_data.graphics_data['dot'][0]),
+                                pos_left_corner[1] + len(self._graphic_data.graphics_data['dot'])]
+            if (self._cursor_x >= pos_left_corner[0] and self._cursor_x < pos_right_corner[0]
+               and self._cursor_y >= pos_left_corner[1] and self._cursor_y < pos_right_corner[1]):
+                dot_return = dot
+        if (dot_return is not None):
+            return dot_return
 
     def board_str(self):
         return_str = []
@@ -68,7 +83,7 @@ class Display:
             return_list.append(_)
         return return_list
 
-    def type_item_into_list(self, item: list, coordinates: tuple):
+    def type_item_into_display_list(self, item: list, coordinates: tuple):
         if (coordinates[0] < 0 or coordinates[1] < 0):
             raise CoordinatesError("Coordinates cannot be negative!")
         if ((coordinates[0] + len(item[0])) > len(self._display_list[0])
@@ -87,7 +102,14 @@ class Display:
         indv_items_to_print = list(items_with_positions.keys())
         for item in indv_items_to_print:
             for position in items_with_positions[item]:
-                self.type_item_into_list(self._graphic_data.graphics_data[item], position)
+                self.type_item_into_display_list(self._graphic_data.graphics_data[item], position)
+
+    def connect_dots(self, dots_list: list):
+        keys = self._graphic_data.board_data["connected_dots"].keys()
+        for key in keys:
+            for dot in self._graphic_data.board_data["connected_dots"][key]:
+                dots_list[key].set_connection(dots_list[dot])
+                dots_list[dot].set_connection(dots_list[key])
 
     def create_full_display_list(self):
         board_height = self._graphic_data.board_data["dot"][-1][1] + 3
@@ -119,7 +141,7 @@ class Display:
             if (temp_pos[0] > (single_player_panel_x_size - 1)):
                 temp_pos[1] += pawn_height + 1
                 temp_pos[0] = 0
-            player1_pawns.append(Pawn(temp_pos, 1))
+            player1_pawns.append(Pawn(temp_pos, False))
             temp_pos[0] += (pawn_width + 2)
 
         temp_pos = [x_display_size - (pawn_width+2), start_y]
@@ -127,30 +149,33 @@ class Display:
             if (temp_pos[0] < (x_display_size - single_player_panel_x_size - 1)):
                 temp_pos[1] += pawn_height + 1
                 temp_pos[0] = x_display_size - (pawn_width+2)
-            player2_pawns.append(Pawn(temp_pos, 2))
+            player2_pawns.append(Pawn(temp_pos, True))
             temp_pos[0] -= (pawn_width + 2)
 
         display_dict = {}
-
-        board_items = self._graphic_data.board_data.keys()
+        board_items = list(self._graphic_data.board_data.keys())
+        board_items.remove("connected_dots")
         for item in board_items:
             _ = []
             for position in self._graphic_data.board_data[item]:
                 _.append((position[0] + (single_player_panel_x_size), position[1]))
             display_dict[item] = _
+        dots_list = []
+        for position in display_dict['dot']:
+            dots_list.append(Dot(list(position)))
+        self.connect_dots(dots_list)
 
         return_list = self.create_display_list((x_display_size, board_height))
         self._display_list = return_list
 
         self.type_miltiple_items(display_dict)
 
-        self.type_item_into_list(["Player 1", " pawns: "], (0, start_y-3))
-        self.type_item_into_list(["Player 2", " pawns: "], (headline_x, start_y-3))
+        self.type_item_into_display_list(["Player 1", " pawns: "], (0, start_y-3))
+        self.type_item_into_display_list(["Player 2", " pawns: "], (headline_x, start_y-3))
 
-        return return_list, player1_pawns, player2_pawns
+        return return_list, dots_list, player1_pawns, player2_pawns
 
     def draw_display(self, wrapper):
-        # Loop where k is the last character pressed, and it updates the display when some key was pressed
         wrapper.clear()
         height, width = wrapper.getmaxyx()
         baord_str = self.board_str()
@@ -167,8 +192,18 @@ class Display:
                 self._cursor_x = self._cursor_x - 2
             elif self._key == 'e':
                 self._catch = not self._catch
-                if (self._saved_pos is not None):
-                    self._holding_pawn.set_position(self._saved_pos)
+                if (self._saved_pos is not None and self._holding_pawn is not None):
+                    dot = self.check_if_above_dot()
+                    if (dot is not None and dot.pawn_on_top is None):
+                        self._holding_pawn.set_position(dot.position)
+                        self._holding_pawn.pawn_was_moved()
+                        dot.set_pawn_on_top(self._holding_pawn)
+                        if (self._saved_pos != dot.position):
+                            self._game_lord.change_turn()
+                    else:
+                        self._holding_pawn.set_position(self._saved_pos)
+                        if (self._saved_dot is not None):
+                            self._saved_dot.set_pawn_on_top(self._holding_pawn)
 
             self._cursor_x = max(0, self._cursor_x)
             self._cursor_x = min(width-2, self._cursor_x)
@@ -187,31 +222,37 @@ class Display:
                 i += 1
             del i
 
-            holding_pawn_text = "No pawn is currently being held"
-            if self._holding_pawn is not None:
-                holding_pawn_text = f"{self._holding_pawn}"
-            whstr = "holding_pawn: {}".format(holding_pawn_text)
-            wrapper.addstr(0, 1, whstr)
+            # holding_pawn_text = "No pawn is currently being held"
+            # if self._holding_pawn is not None:
+            #     holding_pawn_text = f"{self._holding_pawn}"
+            # whstr = "dot21 is connected with: dot{}, dot{}, dot{}".format(self._dots_list.index(self._dots_list[21]._dots_connected_with[0]), self._dots_list.index(self._dots_list[21]._dots_connected_with[1]), self._dots_list.index(self._dots_list[21]._dots_connected_with[2]))
+            # wrapper.addstr(0, 1, whstr)
 
-            wrapper.attron(curses.color_pair(2))
             for pawn in self._player1_pawns:
                 pawn_str = self.pawn_str(pawn)
                 temp_pos = list(pawn.position)
                 for row in pawn_str:
-                    wrapper.addstr(temp_pos[1], temp_pos[0], row)
+                    if (pawn.has_been_moved is True):
+                        wrapper.attron(curses.color_pair(2))
+                        wrapper.addstr(temp_pos[1], temp_pos[0], row)
+                        wrapper.attroff(curses.color_pair(2))
+                    else:
+                        wrapper.addstr(temp_pos[1], temp_pos[0], row)
                     temp_pos[1] += 1
                 del temp_pos
-            wrapper.attroff(curses.color_pair(2))
 
-            wrapper.attron(curses.color_pair(3))
             for pawn in self._player2_pawns:
                 pawn_str = self.pawn_str(pawn)
                 temp_pos = list(pawn.position)
                 for row in pawn_str:
-                    wrapper.addstr(temp_pos[1], temp_pos[0], row)
+                    if (pawn.has_been_moved is True):
+                        wrapper.attron(curses.color_pair(3))
+                        wrapper.addstr(temp_pos[1], temp_pos[0], row)
+                        wrapper.attroff(curses.color_pair(3))
+                    else:
+                        wrapper.addstr(temp_pos[1], temp_pos[0], row)
                     temp_pos[1] += 1
                 del temp_pos
-            wrapper.attroff(curses.color_pair(3))
 
             # Render status bar
             wrapper.attron(curses.color_pair(5))
@@ -227,6 +268,7 @@ class Display:
                     self._holding_pawn = None
                     self._saved_pos = None
                     self._position_difference = None
+                    self._saved_dot = None
             elif (self._catch is True):
                 wrapper.attron(curses.color_pair(4))
                 wrapper.addstr(self._cursor_y, self._cursor_x, "██")
@@ -238,6 +280,10 @@ class Display:
                     elif (self._saved_pos is None):
                         self._saved_pos = list(self._holding_pawn.position)
                         self._position_difference = list([self._cursor_x-self._saved_pos[0], self._cursor_y-self._saved_pos[1]])
+                        dot = self.check_if_above_dot()
+                        if dot is not None:
+                            self._saved_dot = dot
+                            dot.set_pawn_on_top(None)
 
             # Refresh the screen and move the cursor for rendering so it is not next to my pointer
             wrapper.move(height - 1, width - 1)
@@ -289,15 +335,3 @@ class Display:
     @property
     def key(self):
         return self._key
-
-    @property
-    def display_list(self):
-        return self._display_list
-
-    @property
-    def player1_pawn_list(self):
-        return self._player1_pawns
-
-    @property
-    def player2_pawn_list(self):
-        return self._player2_pawns

@@ -30,6 +30,7 @@ class Board:
             raise WrongBoardSize(number=size, possible_numbers=possible_sizes)
         self._size = size
         self._terminal_size = calc_terminal_board_size(no_of_sqr)
+        self._no_of_sqr = no_of_sqr
 
     def __str__(self):
         return f'Board of size: {self._size}'
@@ -42,13 +43,16 @@ class Board:
     def terminal_size(self):
         return self._terminal_size
 
+    @property
+    def no_of_sqr(self):
+        return self._no_of_sqr
+
 
 class Pawn:
-    def __init__(self, position: list, player_no: int):
-        if (player_no not in [1, 2]):
-            raise ValueError("wrong player number given")
-        self._player_no = player_no
+    def __init__(self, position: list, player_no_1: bool):
+        self._player_no_1 = player_no_1
         self._position = list(position)
+        self._has_been_moved = False
 
     def __str__(self):
         return f'This is pawn of player {self._player_no}, at position: x:{int(self._position[0]/2)}, y:{self._position[1]}'
@@ -56,10 +60,38 @@ class Pawn:
     def set_position(self, position: list):
         self._position = position
 
+    def pawn_was_moved(self):
+        self._has_been_moved = True
+
     @property
-    def player_no(self):
-        return self._player_no
+    def has_been_moved(self):
+        return self._has_been_moved
+
+    @property
+    def player_no_1(self):
+        return self._player_no_1
 
     @property
     def position(self):
         return (self._position)
+
+
+class Dot:
+    def __init__(self, position: list):
+        self._position = position
+        self._dots_connected_with = []
+        self._pawn_on_top = None
+
+    def set_connection(self, dot):
+        self._dots_connected_with.append(dot)
+
+    def set_pawn_on_top(self, pawn):
+        self._pawn_on_top = pawn
+
+    @property
+    def position(self):
+        return self._position
+
+    @property
+    def pawn_on_top(self):
+        return self._pawn_on_top
