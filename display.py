@@ -142,12 +142,6 @@ class Display:
                 i += 1
             del i
 
-            # holding_pawn_text = "No pawn is currently being held"
-            # if self._holding_pawn is not None:
-            #     holding_pawn_text = f"{self._holding_pawn}"
-            # whstr = "dot21 is connected with: dot{}, dot{}, dot{}".format(self._dots_list.index(self._dots_list[21]._dots_connected_with[0]), self._dots_list.index(self._dots_list[21]._dots_connected_with[1]), self._dots_list.index(self._dots_list[21]._dots_connected_with[2]))
-            # wrapper.addstr(0, 1, whstr)
-
             for pawn in self._game_lord._player1_pawns:
                 pawn_str = self.pawn_str(pawn)
                 temp_pos = list(pawn.position)

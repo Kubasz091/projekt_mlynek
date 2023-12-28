@@ -9,14 +9,17 @@ class GameLord:
         self._player1_pawns = []
         self._player2_pawns = []
         self._player1_turn = bool(getrandbits(1))
+        self._render_one_more_frame = False
 
         self._display = Display(size, self)
         self.connect_dots(self._dots_list)
 
-        self._key = None
         self._cursor_x = 0
         self._cursor_y = 0
+
         self._catch = False
+
+        self._key = None
         self._saved_pos = None
         self._position_difference = None
         self._holding_pawn = None
@@ -65,6 +68,18 @@ class GameLord:
                 dots_list[key].set_connection(dots_list[dot])
                 dots_list[dot].set_connection(dots_list[key])
 
+    def check_move(self, dot: Dot):
+        if (self._holding_pawn.player_no_1 is True):
+            if (dot in self._saved_dot.connected_dots or len(self._player1_pawns) < 4):
+                return True
+            else:
+                return False
+        elif (self._holding_pawn.player_no_1 is False):
+            if (dot in self._saved_dot.connected_dots or len(self._player2_pawns) < 4):
+                return True
+            else:
+                return False
+
     def keyboard_functionality(self, height: int, width: int):
         if self._key == "KEY_DOWN":
             self._cursor_y = self._cursor_y + 1
@@ -78,7 +93,10 @@ class GameLord:
             self._catch = not self._catch
             if (self._saved_pos is not None and self._holding_pawn is not None):
                 dot = self.check_if_above_dot([self._cursor_x, self._cursor_y])
-                if (dot is not None and dot.pawn_on_top is None):
+                move_possible = True
+                if self._saved_dot is not None and dot is not None:
+                    move_possible = self.check_move(dot)
+                if (dot is not None and dot.pawn_on_top is None and move_possible is True):
                     self._holding_pawn.set_position(dot.position)
                     self._holding_pawn.pawn_was_moved()
                     dot.set_pawn_on_top(self._holding_pawn)
@@ -114,6 +132,7 @@ class GameLord:
                 self._holding_pawn = self.check_if_above_pawn([self._cursor_x, self._cursor_y])
                 if self._holding_pawn is None:
                     self._catch = not self._catch
+                    self._render_one_more_frame = True
                 elif (self._saved_pos is None):
                     self._saved_pos = list(self._holding_pawn.position)
                     self._position_difference = list([self._cursor_x-self._saved_pos[0], self._cursor_y-self._saved_pos[1]])
@@ -129,9 +148,17 @@ class GameLord:
     def set_key(self, key):
         self._key = key
 
+    def displayed_one_more_frame(self):
+        self._render_one_more_frame = False
+
+    @property
+    def one_more_frame(self):
+        return self._render_one_more_frame
+
     @property
     def key(self):
         return self._key
+
     @property
     def player1_turn(self):
         return self._player1_turn

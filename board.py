@@ -95,3 +95,7 @@ class Dot:
     @property
     def pawn_on_top(self):
         return self._pawn_on_top
+
+    @property
+    def connected_dots(self):
+        return self._dots_connected_with
