@@ -174,10 +174,17 @@ class Display:
             wrapper.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
             wrapper.attroff(curses.color_pair(5))
 
+            
+
             if (is_blue is True):
-                wrapper.attron(curses.color_pair(1))
-                wrapper.addstr(cursor_y, cursor_x, "██")
-                wrapper.attroff(curses.color_pair(1))
+                if self._game_lord.player1_turn is True:
+                    wrapper.attron(curses.color_pair(2))
+                    wrapper.addstr(cursor_y, cursor_x, "██")
+                    wrapper.attroff(curses.color_pair(2))
+                else:
+                    wrapper.attron(curses.color_pair(3))
+                    wrapper.addstr(cursor_y, cursor_x, "██")
+                    wrapper.attroff(curses.color_pair(3))
             else:
                 wrapper.attron(curses.color_pair(4))
                 wrapper.addstr(cursor_y, cursor_x, "██")

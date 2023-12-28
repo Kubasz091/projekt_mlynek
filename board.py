@@ -52,16 +52,28 @@ class Pawn:
     def __init__(self, position: list, player_no_1: bool):
         self._player_no_1 = player_no_1
         self._position = list(position)
+        self._pawns_in_mill_with = []
         self._has_been_moved = False
+        self._dot_below = None
 
     def __str__(self):
-        return f'This is pawn of player {self._player_no}, at position: x:{int(self._position[0]/2)}, y:{self._position[1]}'
+        return f'This is pawn of player {self._player_no_1}, at position: x:{int(self._position[0]/2)}, y:{self._position[1]}'
 
     def set_position(self, position: list):
         self._position = position
 
     def pawn_was_moved(self):
         self._has_been_moved = True
+
+    def set_dot_below(self, dot):
+        self._dot_below = dot
+
+    def make_mill(self, pawn1, pawn2):
+        self._pawns_in_mill_with.append(pawn1)
+        self._pawns_in_mill_with.append(pawn2)
+
+    def destroy_mill(self):
+        self._pawns_in_mill_with = []
 
     @property
     def has_been_moved(self):
@@ -74,6 +86,14 @@ class Pawn:
     @property
     def position(self):
         return (self._position)
+
+    @property
+    def dot_below(self):
+        return self._dot_below
+
+    @property
+    def pawns_in_mill_with(self):
+        return self._pawns_in_mill_with
 
 
 class Dot:
