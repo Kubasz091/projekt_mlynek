@@ -1,6 +1,7 @@
 from random import getrandbits
 from board import Pawn, Dot
 from display import Display
+from pawn_placement_saver import PawnPlacementSaver
 
 
 class GameLord:
@@ -10,17 +11,23 @@ class GameLord:
         self._player2_pawns = []
         self._active_mills = []
         self._player1_turn = bool(getrandbits(1))
+        self._started_player1 = self._player1_turn
         self._render_one_more_frame = False
 
         self._display = Display(size, self)
         self.connect_dots(self._dots_list)
 
+        self._placement_saver = PawnPlacementSaver(40)
+
         self._cursor_x = 0
         self._cursor_y = 0
 
         self._catch = False
-        self._deletion_move = False
-        self._end_game = False
+        self._deletion_moves = 0
+
+        self._player1_won = False
+        self._player2_won = False
+        self._draw = False
 
         self._key = None
         self._saved_pos = None
@@ -30,6 +37,7 @@ class GameLord:
 
     def change_turn(self):
         self._player1_turn = not self._player1_turn
+        self._placement_saver.count_round_without_mill()
 
     def add_dot(self, dot: Dot):
         self._dots_list.append(dot)
@@ -94,15 +102,12 @@ class GameLord:
                 player2_pawns_on_board.append(pawn)
 
         found_mills = self.search_mills(player1_pawns_on_board, player2_pawns_on_board)
-        granted_detetion_move = False
 
         for mill in found_mills:
             if mill not in self._active_mills:
                 self.add_mill(mill)
-                if (granted_detetion_move is False):
-                    self.grant_deletion_move()
-                    self.change_turn()
-                    granted_detetion_move = True
+                self.grant_deletion_move()
+                self._placement_saver.mill_occured()
 
         for mill_saved in self._active_mills:
             if mill_saved not in found_mills:
@@ -152,10 +157,54 @@ class GameLord:
         self._active_mills.remove(mill)
 
     def grant_deletion_move(self):
-        self._deletion_move = True
+        self._deletion_moves += 1
 
-    def check_end_of_game(self):
-        pass
+    def check_end_of_game(self, changed_pawns_placement: bool):
+        player1_moved = False
+        player2_moved = False
+
+        for pawn in self._player1_pawns:
+            if pawn.has_been_moved is True:
+                player1_moved = True
+
+        for pawn in self._player2_pawns:
+            if pawn.has_been_moved is True:
+                player2_moved = True
+        if len(self._player1_pawns) < 3 or (len(self.check_possible_moves(self._player1_pawns)) == 0 and player1_moved is True):
+            self._player2_won = True
+        elif len(self._player2_pawns) < 3 or (len(self.check_possible_moves(self._player2_pawns)) == 0 and player2_moved is True):
+            self._player1_won = True
+
+        if self._deletion_moves == 0 and changed_pawns_placement is True:
+            current_board_placement = self.build_board_placement_list()
+
+            self._placement_saver.save_placement(current_board_placement)
+            self.change_turn()
+
+            if self._placement_saver.check_if_repeted(current_board_placement) >= 3:
+                self._draw = True
+            elif self._placement_saver.mill_counter >= self._placement_saver.depth:
+                self._draw = True
+
+    def build_board_placement_list(self):
+        return_list = []
+        for dot in self._dots_list:
+            if dot.pawn_on_top is None:
+                return_list.append(0)
+            elif dot.pawn_on_top.player_no_1 is True:
+                return_list.append(1)
+            elif dot.pawn_on_top.player_no_1 is False:
+                return_list.append(2)
+        return return_list
+
+    def check_possible_moves(self, pawns: Pawn):
+        possible_moves = []
+        for pawn in pawns:
+            if pawn.has_been_moved is True:
+                for dot in pawn.dot_below.connected_dots:
+                    if dot.pawn_on_top is None:
+                        possible_moves.append([pawn.dot_below, dot])
+        return possible_moves
 
     def keyboard_functionality(self, height: int, width: int):
         if self._key == "KEY_DOWN":
@@ -170,16 +219,17 @@ class GameLord:
         elif self._key == 'e':
             self._catch = not self._catch
 
-        self._cursor_x = max(0, self._cursor_x)
-        self._cursor_x = min(width-2, self._cursor_x)
+        self._cursor_x = max(4, self._cursor_x)
+        self._cursor_x = min(width-6, self._cursor_x)
 
-        self._cursor_y = max(0, self._cursor_y)
-        self._cursor_y = min(height-2, self._cursor_y)
+        self._cursor_y = max(2, self._cursor_y)
+        self._cursor_y = min(height-4, self._cursor_y)
 
         return self._cursor_x, self._cursor_y
 
     def game_mechanics(self):
         is_blue = True
+        changed_pawns_placement = False
         if self._catch is True and self._holding_pawn is not None:
             self._holding_pawn.set_position([self._cursor_x-self._position_difference[0], self._cursor_y-self._position_difference[1]])
 
@@ -200,9 +250,8 @@ class GameLord:
 
                     dot.set_pawn_on_top(self._holding_pawn)
 
-                    if (self._saved_pos != dot.position):
-                        if (self._deletion_move is False):
-                            self.change_turn()
+                    if (self._saved_pos != dot.position and self._deletion_moves == 0):
+                        changed_pawns_placement = True
                 else:
                     self._holding_pawn.set_position(self._saved_pos)
             self._holding_pawn = None
@@ -229,13 +278,13 @@ class GameLord:
                     self._catch = not self._catch
                     self._render_one_more_frame = True
 
-                elif (self._deletion_move is False and (self._holding_pawn.player_no_1 is not self._player1_turn
+                elif (self._deletion_moves == 0 and (self._holding_pawn.player_no_1 is not self._player1_turn
                                                         or (self._holding_pawn.has_been_moved is True and completed_putting_on_board is False))):
                     self._catch = not self._catch
                     self._render_one_more_frame = True
                     self._holding_pawn = None
 
-                if (self._deletion_move is True and self._holding_pawn is not None
+                if (self._deletion_moves > 0 and self._holding_pawn is not None
                    and self._holding_pawn.player_no_1 is not self._player1_turn and self._holding_pawn.has_been_moved is True
                    and len(self._holding_pawn.pawns_in_mill_with) == 0):
                     if self._holding_pawn.player_no_1 is True:
@@ -244,12 +293,14 @@ class GameLord:
                         self._player2_pawns.remove(self._holding_pawn)
                     self._holding_pawn.dot_below.set_pawn_on_top(None)
                     self._holding_pawn = None
-                    self._deletion_move = False
+                    self._deletion_moves -= 1
                     self._catch = not self._catch
-                    self.change_turn()
                     self._render_one_more_frame = True
-                elif (self._deletion_move is True and self._holding_pawn is not None
-                      and (self._holding_pawn.player_no_1 is self._player1_turn or len(self._holding_pawn.pawns_in_mill_with) != 0)):
+
+                    changed_pawns_placement = True  # self.change_turn()
+                elif (self._deletion_moves > 0 and self._holding_pawn is not None
+                      and (self._holding_pawn.player_no_1 is self._player1_turn or len(self._holding_pawn.pawns_in_mill_with) != 0
+                           or self._holding_pawn.has_been_moved is False)):
                     self._catch = not self._catch
                     self._render_one_more_frame = True
                     self._holding_pawn = None
@@ -261,6 +312,7 @@ class GameLord:
                     if dot is not None:
                         self._saved_dot = dot
         self.check_mills()
+        self.check_end_of_game(changed_pawns_placement)
         return is_blue
 
     def display_frame(self, wrapper):

@@ -1,6 +1,7 @@
 from board import Board, Pawn, Dot
 from graphic_data import GraphicData
 import curses
+from time import sleep
 
 
 class CoordinatesError(Exception):
@@ -128,7 +129,8 @@ class Display:
         height, width = wrapper.getmaxyx()
         baord_str = self.board_str()
 
-        if (height >= len(baord_str)+1 and width >= len(baord_str[0])):
+        if (height >= len(baord_str)+1 and width >= len(baord_str[0]) and self._game_lord._player1_won is False
+           and self._game_lord._player2_won is False and self._game_lord._draw is False):
             # keyboard functionality
             cursor_x, cursor_y = self._game_lord.keyboard_functionality(len(baord_str)+1, len(baord_str[0]))
 
@@ -174,7 +176,7 @@ class Display:
             wrapper.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
             wrapper.attroff(curses.color_pair(5))
 
-            whstr = f'{self._game_lord._draw}'
+            whstr = f'{self._game_lord._deletion_moves}'
             whstr2 = 'no mills'
             if (len(self._game_lord._active_mills) > 0):
                 whstr2 = "Mill: dot{}, dot{}, dot{}".format(self._game_lord._dots_list.index(self._game_lord._active_mills[0][0].dot_below), self._game_lord._dots_list.index(self._game_lord._active_mills[0][1].dot_below), self._game_lord._dots_list.index(self._game_lord._active_mills[0][2].dot_below))
@@ -200,7 +202,8 @@ class Display:
             wrapper.refresh()
 
         # if terminal size is not big enough to fit the whole board notify the user
-        else:
+        elif (height < len(baord_str)+1 and width < len(baord_str[0]) and self._game_lord._player1_won is False
+              and self._game_lord._player2_won is False and self._game_lord._draw is False):
             x_message = width - len(baord_str[0])
             y_message = height - (len(baord_str)+1)
             x_message = min(0, x_message)
@@ -231,3 +234,37 @@ class Display:
             wrapper.move(height - 1, width - 1)
 
             wrapper.refresh()
+        elif self._game_lord._player1_won is True:
+            start_x = int((width - len(self._graphic_data.graphics_data['player1_won'][0]))/2)
+            start_y = int((height - len(self._graphic_data.graphics_data['player1_won']))/2)
+            i = 0
+            for row in self._graphic_data.graphics_data['player1_won']:
+                wrapper.addstr(start_y + i, start_x, row)
+                i += 1
+            wrapper.move(height - 1, width - 1)
+            wrapper.refresh()
+            sleep(5)
+            exit()
+
+        elif self._game_lord._player2_won is True:
+            start_x = int((width - len(self._graphic_data.graphics_data['player2_won'][0]))/2)
+            start_y = int((height - len(self._graphic_data.graphics_data['player2_won']))/2)
+            i = 0
+            for row in self._graphic_data.graphics_data['player2_won']:
+                wrapper.addstr(start_y + i, start_x, row)
+                i += 1
+            wrapper.move(height - 1, width - 1)
+            wrapper.refresh()
+            sleep(5)
+            exit()
+        elif self._game_lord._draw is True:
+            start_x = int((width - len(self._graphic_data.graphics_data['draw'][0]))/2)
+            start_y = int((height - len(self._graphic_data.graphics_data['draw']))/2)
+            i = 0
+            for row in self._graphic_data.graphics_data['draw']:
+                wrapper.addstr(start_y + i, start_x, row)
+                i += 1
+            wrapper.move(height - 1, width - 1)
+            wrapper.refresh()
+            sleep(5)
+            exit()
