@@ -67,7 +67,7 @@ class Display:
                 self.type_item_into_display_list(self._graphic_data.graphics_data[item], position)
 
     def create_full_display_list(self):
-        board_height = self._graphic_data.board_data["dot"][-1][1] + 3
+        board_height = self._graphic_data.board_data["dot"][-1][1] + 3 + 4
         board_width = self._graphic_data.board_data["dot"][2][0] + 6
 
         pawn_height = len(self._graphic_data.graphics_data["pawn_player1"])
@@ -78,29 +78,29 @@ class Display:
         if (pawn_columns == 1):
             pawn_columns += 1
 
-        single_player_panel_x_size = (pawn_width + 2) * pawn_columns
-        x_display_size = board_width + (2 * single_player_panel_x_size) + 2
+        single_player_panel_x_size = ((pawn_width + 2) * pawn_columns) + 4
+        x_display_size = board_width + (2 * single_player_panel_x_size)
 
         no_of_pawns_in_a_column = (self._graphic_data.size // pawn_columns)
         if (self._graphic_data.size % pawn_columns) != 0:
             no_of_pawns_in_a_column += 1
 
-        start_y = int((board_height - (no_of_pawns_in_a_column * (pawn_height + 1))) / 2) + 1
-        headline_x = x_display_size - (pawn_columns * (pawn_width + 2))
+        start_y = int((board_height - (no_of_pawns_in_a_column * (pawn_height + 1))) / 2)+2
+        headline_x = x_display_size - (pawn_columns * (pawn_width + 2) + 4)
 
-        temp_pos = [0, start_y]
+        temp_pos = [4, start_y]
         for pawn in range(self._graphic_data.size):
-            if (temp_pos[0] > (single_player_panel_x_size - 1)):
+            if (temp_pos[0] > (single_player_panel_x_size-1)):
                 temp_pos[1] += pawn_height + 1
-                temp_pos[0] = 0
+                temp_pos[0] = 4
             self._game_lord.add_player1_pawn(Pawn(temp_pos, True))
             temp_pos[0] += (pawn_width + 2)
 
-        temp_pos = [x_display_size - (pawn_width+2), start_y]
+        temp_pos = [x_display_size - (pawn_width+2+2), start_y]
         for pawn in range(self._graphic_data.size):
-            if (temp_pos[0] < (x_display_size - single_player_panel_x_size - 1)):
+            if (temp_pos[0] < (x_display_size - single_player_panel_x_size-1)):
                 temp_pos[1] += pawn_height + 1
-                temp_pos[0] = x_display_size - (pawn_width+2)
+                temp_pos[0] = x_display_size - (pawn_width+2+2)
             self._game_lord.add_player2_pawn(Pawn(temp_pos, False))
             temp_pos[0] -= (pawn_width + 2)
 
@@ -110,7 +110,7 @@ class Display:
         for item in board_items:
             _ = []
             for position in self._graphic_data.board_data[item]:
-                _.append((position[0] + (single_player_panel_x_size), position[1]))
+                _.append((position[0] + (single_player_panel_x_size), position[1] + 2))
             display_dict[item] = _
 
         for position in display_dict['dot']:
@@ -120,7 +120,7 @@ class Display:
 
         self.type_miltiple_items(display_dict)
 
-        self.type_item_into_display_list(["Player 1", " pawns: "], (0, start_y-3))
+        self.type_item_into_display_list(["Player 1", " pawns: "], (4, start_y-3))
         self.type_item_into_display_list(["Player 2", " pawns: "], (headline_x, start_y-3))
 
     def draw_display(self, wrapper):
@@ -130,7 +130,7 @@ class Display:
 
         if (height >= len(baord_str)+1 and width >= len(baord_str[0])):
             # keyboard functionality
-            cursor_x, cursor_y = self._game_lord.keyboard_functionality(height, width)
+            cursor_x, cursor_y = self._game_lord.keyboard_functionality(len(baord_str)+1, len(baord_str[0]))
 
             is_blue = self._game_lord.game_mechanics()
 
@@ -174,7 +174,12 @@ class Display:
             wrapper.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
             wrapper.attroff(curses.color_pair(5))
 
-            
+            whstr = f'{self._game_lord._draw}'
+            whstr2 = 'no mills'
+            if (len(self._game_lord._active_mills) > 0):
+                whstr2 = "Mill: dot{}, dot{}, dot{}".format(self._game_lord._dots_list.index(self._game_lord._active_mills[0][0].dot_below), self._game_lord._dots_list.index(self._game_lord._active_mills[0][1].dot_below), self._game_lord._dots_list.index(self._game_lord._active_mills[0][2].dot_below))
+            wrapper.addstr(0, 1, whstr)
+            wrapper.addstr(1, 1, whstr2)
 
             if (is_blue is True):
                 if self._game_lord.player1_turn is True:
@@ -197,7 +202,7 @@ class Display:
         # if terminal size is not big enough to fit the whole board notify the user
         else:
             x_message = width - len(baord_str[0])
-            y_message = height - len(baord_str)
+            y_message = height - (len(baord_str)+1)
             x_message = min(0, x_message)
             y_message = min(0, y_message)
             y_message = abs(y_message)
