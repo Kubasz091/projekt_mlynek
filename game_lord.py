@@ -20,6 +20,7 @@ class GameLord:
 
         self._catch = False
         self._deletion_move = False
+        self._end_game = False
 
         self._key = None
         self._saved_pos = None
@@ -93,11 +94,15 @@ class GameLord:
                 player2_pawns_on_board.append(pawn)
 
         found_mills = self.search_mills(player1_pawns_on_board, player2_pawns_on_board)
+        granted_detetion_move = False
 
         for mill in found_mills:
             if mill not in self._active_mills:
                 self.add_mill(mill)
-                # self.grant_deletion_move()
+                if (granted_detetion_move is False):
+                    self.grant_deletion_move()
+                    self.change_turn()
+                    granted_detetion_move = True
 
         for mill_saved in self._active_mills:
             if mill_saved not in found_mills:
@@ -148,6 +153,9 @@ class GameLord:
 
     def grant_deletion_move(self):
         self._deletion_move = True
+
+    def check_end_of_game(self):
+        pass
 
     def keyboard_functionality(self, height: int, width: int):
         if self._key == "KEY_DOWN":
@@ -204,21 +212,47 @@ class GameLord:
 
         elif (self._catch is True):
             is_blue = False
+            completed_putting_on_board = True
             if self._holding_pawn is None:
                 self._holding_pawn = self.check_if_above_pawn([self._cursor_x, self._cursor_y])
+
+                if (self._player1_turn is True):
+                    for pawn in self._player1_pawns:
+                        if (pawn.has_been_moved is False):
+                            completed_putting_on_board = False
+                elif (self._player1_turn is False):
+                    for pawn in self._player2_pawns:
+                        if (pawn.has_been_moved is False):
+                            completed_putting_on_board = False
 
                 if self._holding_pawn is None:
                     self._catch = not self._catch
                     self._render_one_more_frame = True
-                elif (self._deletion_move is False and self._holding_pawn.player_no_1 is not self._player1_turn):
+
+                elif (self._deletion_move is False and (self._holding_pawn.player_no_1 is not self._player1_turn
+                                                        or (self._holding_pawn.has_been_moved is True and completed_putting_on_board is False))):
                     self._catch = not self._catch
                     self._render_one_more_frame = True
                     self._holding_pawn = None
-                # elif self._deletion_move is True:
-                #     del self._holding_pawn
-                #     self._deletion_move = False
-                #     self._catch = not self._catch
-                #     self.change_turn()
+
+                if (self._deletion_move is True and self._holding_pawn is not None
+                   and self._holding_pawn.player_no_1 is not self._player1_turn and self._holding_pawn.has_been_moved is True
+                   and len(self._holding_pawn.pawns_in_mill_with) == 0):
+                    if self._holding_pawn.player_no_1 is True:
+                        self._player1_pawns.remove(self._holding_pawn)
+                    elif self._holding_pawn.player_no_1 is False:
+                        self._player2_pawns.remove(self._holding_pawn)
+                    self._holding_pawn.dot_below.set_pawn_on_top(None)
+                    self._holding_pawn = None
+                    self._deletion_move = False
+                    self._catch = not self._catch
+                    self.change_turn()
+                    self._render_one_more_frame = True
+                elif (self._deletion_move is True and self._holding_pawn is not None
+                      and (self._holding_pawn.player_no_1 is self._player1_turn or len(self._holding_pawn.pawns_in_mill_with) != 0)):
+                    self._catch = not self._catch
+                    self._render_one_more_frame = True
+                    self._holding_pawn = None
 
                 if (self._holding_pawn is not None and self._saved_pos is None):
                     self._saved_pos = list(self._holding_pawn.position)
