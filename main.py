@@ -1,7 +1,7 @@
 import curses
 from time import sleep, time
 from game_lord import GameLord
-
+from bot import Bot
 
 class ProgramRunner:
     def __init__(self):
@@ -10,24 +10,46 @@ class ProgramRunner:
         self._bot = False
 
         while chose_size is False:
-            self._size = int(input("Choose ammount of pawns that each player will have (3, 6, 9, 12) --> "))
+            try:
+                self._size = int(input("Choose ammount of pawns that each player will have (3, 6, 9, 12) --> "))
+            except Exception:
+                pass
             if self._size in [3, 6, 9, 12]:
                 chose_size = True
             else:
-                print("Typed in wrong size :(")
+                print("Typed in something, that's not 3, 6, 9 or 12 :(")
 
         chose_bot = False
         while chose_bot is False:
-            typein = int(input("if you want to play against a bot, type in 1 if not type in 0 --> "))
+            try:
+                typein = int(input("if you want to play against a bot, type in 1 if not type in 0 --> "))
+            except Exception:
+                typein = 2
             if typein in [0, 1]:
                 chose_bot = True
                 self._bot = bool(typein)
             else:
                 print("Typed in something, that's not 0 or 1 :(")
 
-    def run(self, wrapper):
-        game_lord = GameLord(self._size)
+        if self._bot is True:
+            chose_bot_mode = False
+            while chose_bot_mode is False:
+                try:
+                    typein = int(input("choose bot operation mode ( 1 for radnom moves, 0 for simple logical moves) --> "))
+                except Exception:
+                    typein = 2
+                if typein in [0, 1]:
+                    chose_bot_mode = True
+                    self._bot_mode = bool(typein)
+                else:
+                    print("Typed in something, that's not 0 or 1 :(")
 
+    def run(self, wrapper):
+        bot = None
+        if self._bot is True:
+            bot = Bot(self._bot_mode)
+
+        game_lord = GameLord(self._size, bot)
         wrapper.nodelay(True)
 
         wrapper.clear()
@@ -51,9 +73,15 @@ class ProgramRunner:
                     game_lord.display_frame(wrapper)
                     time_to_display = current_time + 0.02
                 elif (game_lord.one_more_frame is True):
+                    if (self._bot is True and game_lord._player1_turn is True):
+                        game_lord._make_bot_move = True
                     game_lord.display_frame(wrapper)
                     time_to_display = current_time + 0.02
                     game_lord.displayed_one_more_frame()
+                elif (self._bot is True and game_lord._player1_turn is True):
+                    game_lord._make_bot_move = True
+                    game_lord.display_frame(wrapper)
+                    time_to_display = current_time + 0.02
 
 
 if __name__ == "__main__":

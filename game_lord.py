@@ -1,11 +1,12 @@
-from random import getrandbits
+from random import getrandbits, randint
 from board import Pawn, Dot
 from display import Display
 from pawn_placement_saver import PawnPlacementSaver
+from bot import Bot
 
 
 class GameLord:
-    def __init__(self, size: int):
+    def __init__(self, size: int, bot: Bot):
         self._dots_list = []
         self._player1_pawns = []
         self._player2_pawns = []
@@ -13,6 +14,9 @@ class GameLord:
         self._player1_turn = bool(getrandbits(1))
         self._started_player1 = self._player1_turn
         self._render_one_more_frame = False
+
+        self._bot = bot
+        self._make_bot_move = False
 
         self._display = Display(size, self)
         self.connect_dots(self._dots_list)
@@ -197,14 +201,61 @@ class GameLord:
                 return_list.append(2)
         return return_list
 
-    def check_possible_moves(self, pawns: Pawn):
+    def check_possible_moves(self, pawns: list):
         possible_moves = []
+        no_of_unmoved_pawns = 0
         for pawn in pawns:
-            if pawn.has_been_moved is True:
+            if pawn.has_been_moved is False:
+                no_of_unmoved_pawns += 1
+        for pawn in pawns:
+            if pawn.has_been_moved is True and no_of_unmoved_pawns == 0:
                 for dot in pawn.dot_below.connected_dots:
                     if dot.pawn_on_top is None:
                         possible_moves.append([pawn.dot_below, dot])
+            if pawn.has_been_moved is False:
+                for dot in self._dots_list:
+                    if dot.pawn_on_top is None:
+                        possible_moves.append([pawn, dot])
         return possible_moves
+
+    def make_bot_move(self):
+        if self._bot.random is True:
+            if (self._deletion_moves == 0):
+                possible_moves = self.check_possible_moves(self._player1_pawns)
+                move_number = randint(0, len(possible_moves)-1)
+                dots = possible_moves[move_number]
+                if (type(dots[0]) is Pawn):
+                    dots[0].set_position(dots[1].position)
+                    dots[0].pawn_was_moved()
+                    dots[0].set_dot_below(dots[1])
+
+                    dots[1].set_pawn_on_top(dots[0])
+                elif (type(dots[0]) is Dot):
+                    pawn = dots[0].pawn_on_top
+                    pawn.set_position(dots[1].position)
+                    pawn.pawn_was_moved()
+                    pawn.set_dot_below(dots[1])
+
+                    dots[0].set_pawn_on_top(None)
+                    dots[1].set_pawn_on_top(pawn)
+            elif (self._deletion_moves > 0):
+                possible_pawns_to_delete = []
+                for pawn in self._player2_pawns:
+                    if pawn.has_been_moved is True and len(pawn.pawns_in_mill_with) == 0:
+                        possible_pawns_to_delete.append(pawn)
+
+                move_number = randint(0, len(possible_pawns_to_delete)-1)
+                pawn_to_delete = possible_pawns_to_delete[move_number]
+
+                self._player2_pawns.remove(pawn_to_delete)
+                pawn_to_delete.dot_below.set_pawn_on_top(None)
+
+                self._deletion_moves -= 1
+                self._render_one_more_frame = True
+            self._make_bot_move = False
+            return True
+        # else:
+        #     return True
 
     def keyboard_functionality(self, height: int, width: int):
         if self._key == "KEY_DOWN":
@@ -279,7 +330,7 @@ class GameLord:
                     self._render_one_more_frame = True
 
                 elif (self._deletion_moves == 0 and (self._holding_pawn.player_no_1 is not self._player1_turn
-                                                        or (self._holding_pawn.has_been_moved is True and completed_putting_on_board is False))):
+                                                     or (self._holding_pawn.has_been_moved is True and completed_putting_on_board is False))):
                     self._catch = not self._catch
                     self._render_one_more_frame = True
                     self._holding_pawn = None
@@ -311,6 +362,8 @@ class GameLord:
                     dot = self.check_if_above_dot([self._cursor_x, self._cursor_y])
                     if dot is not None:
                         self._saved_dot = dot
+        if self._make_bot_move is True:
+            changed_pawns_placement = self.make_bot_move()
         self.check_mills()
         self.check_end_of_game(changed_pawns_placement)
         return is_blue
