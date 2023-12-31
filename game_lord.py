@@ -362,21 +362,13 @@ class GameLord:
                 if len(player2_possible_mills) > 0:
                     doable_mills = []
                     for mill in player2_possible_mills:
-                        if mill[2].pawn_on_top is None:
-                            if (len(mill[1].pawn_on_top.pawns_in_mill_with) == 0):
-                                doable_mills.append(mill[1])
-                            elif (len(mill[0].pawn_on_top.pawns_in_mill_with) == 0):
-                                doable_mills.append(mill[0])
-                        if mill[1].pawn_on_top is None:
-                            if (len(mill[2].pawn_on_top.pawns_in_mill_with) == 0):
-                                doable_mills.append(mill[2])
-                            elif (len(mill[0].pawn_on_top.pawns_in_mill_with) == 0):
-                                doable_mills.append(mill[0])
-                        if mill[0].pawn_on_top is None:
-                            if (len(mill[1].pawn_on_top.pawns_in_mill_with) == 0):
-                                doable_mills.append(mill[1])
-                            elif (len(mill[2].pawn_on_top.pawns_in_mill_with) == 0):
-                                doable_mills.append(mill[2])
+                        for dot in mill:
+                            if dot.pawn_on_top is None:
+                                other_two_dots = mill
+                                other_two_dots.remove(dot)
+                                for dot_two in other_two_dots:
+                                    if dot_two.pawn_on_top in possible_pawns_to_delete or len(possible_pawns_to_delete) == 0:
+                                        doable_mills.append(dot_two)
                     if len(doable_mills) > 0:
                         move_number = randint(0, len(doable_mills)-1)
                         pawn_to_delete = doable_mills[move_number].pawn_on_top
@@ -428,6 +420,10 @@ class GameLord:
                 if pawn.has_been_moved is True and len(pawn.pawns_in_mill_with) == 0:
                     possible_pawns_to_delete.append(pawn)
 
+            if len(possible_pawns_to_delete) == 0:
+                for pawn in self._player2_pawns:
+                    if pawn.has_been_moved is True:
+                        possible_pawns_to_delete.append(pawn)
             move_number = randint(0, len(possible_pawns_to_delete)-1)
             pawn_to_delete = possible_pawns_to_delete[move_number]
 
@@ -513,9 +509,20 @@ class GameLord:
                     self._catch = not self._catch
                     self._holding_pawn = None
                     self._render_one_more_frame += 1
+                has_pawns_not_in_mill = False
+
+                if self._player1_turn is True:
+                    for pawn in self._player2_pawns:
+                        if len(pawn.pawns_in_mill_with) == 0 and pawn.has_been_moved is True:
+                            has_pawns_not_in_mill = True
+                elif self._player1_turn is False:
+                    for pawn in self._player1_pawns:
+                        if len(pawn.pawns_in_mill_with) == 0 and pawn.has_been_moved is True:
+                            has_pawns_not_in_mill = True
+
                 if (self._deletion_moves > 0 and self._holding_pawn is not None
                    and self._holding_pawn.player_no_1 is not self._player1_turn and self._holding_pawn.has_been_moved is True
-                   and len(self._holding_pawn.pawns_in_mill_with) == 0):
+                   and (len(self._holding_pawn.pawns_in_mill_with) == 0  or has_pawns_not_in_mill is False)):
                     if self._holding_pawn.player_no_1 is True:
                         self._player1_pawns.remove(self._holding_pawn)
                     elif self._holding_pawn.player_no_1 is False:
