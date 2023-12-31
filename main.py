@@ -35,7 +35,7 @@ class ProgramRunner:
             chose_bot_mode = False
             while chose_bot_mode is False:
                 try:
-                    typein = int(input("choose bot operation mode ( 1 for radnom moves, 0 for simple logical moves) --> "))
+                    typein = int(input("choose bot operation mode (1 for radnom moves, 0 for simple logical moves) --> "))
                 except Exception:
                     typein = 2
                 if typein in [0, 1]:
@@ -72,16 +72,10 @@ class ProgramRunner:
                 if (key is not None):
                     game_lord.display_frame(wrapper)
                     time_to_display = current_time + 0.02
-                elif (game_lord.one_more_frame is True):
-                    if (self._bot is True and game_lord._player1_turn is True):
-                        game_lord._make_bot_move = True
+                elif (game_lord.one_more_frame > 0):
                     game_lord.display_frame(wrapper)
                     time_to_display = current_time + 0.02
                     game_lord.displayed_one_more_frame()
-                elif (self._bot is True and game_lord._player1_turn is True):
-                    game_lord._make_bot_move = True
-                    game_lord.display_frame(wrapper)
-                    time_to_display = current_time + 0.02
 
 
 if __name__ == "__main__":

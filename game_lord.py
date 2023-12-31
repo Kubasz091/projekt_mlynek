@@ -3,7 +3,7 @@ from board import Pawn, Dot
 from display import Display
 from pawn_placement_saver import PawnPlacementSaver
 from bot import Bot
-
+from time import sleep
 
 class GameLord:
     def __init__(self, size: int, bot: Bot):
@@ -13,10 +13,9 @@ class GameLord:
         self._active_mills = []
         self._player1_turn = bool(getrandbits(1))
         self._started_player1 = self._player1_turn
-        self._render_one_more_frame = False
+        self._render_one_more_frame = 0
 
         self._bot = bot
-        self._make_bot_move = False
 
         self._display = Display(size, self)
         self.connect_dots(self._dots_list)
@@ -203,59 +202,239 @@ class GameLord:
 
     def check_possible_moves(self, pawns: list):
         possible_moves = []
-        no_of_unmoved_pawns = 0
+        unmoved_pawns = []
+
         for pawn in pawns:
             if pawn.has_been_moved is False:
-                no_of_unmoved_pawns += 1
-        for pawn in pawns:
-            if pawn.has_been_moved is True and no_of_unmoved_pawns == 0:
+                unmoved_pawns.append(pawn)
+        if len(unmoved_pawns) == 0:
+            for pawn in pawns:
                 for dot in pawn.dot_below.connected_dots:
                     if dot.pawn_on_top is None:
-                        possible_moves.append([pawn.dot_below, dot])
-            if pawn.has_been_moved is False:
+                        possible_moves.append([pawn, dot])
+        else:
+            for pawn in unmoved_pawns:
                 for dot in self._dots_list:
                     if dot.pawn_on_top is None:
                         possible_moves.append([pawn, dot])
+        # for pawn in pawns:
+        #     if pawn.has_been_moved is True and no_of_unmoved_pawns == 0:
+        #         for dot in pawn.dot_below.connected_dots:
+        #             if dot.pawn_on_top is None:
+        #                 possible_moves.append([pawn.dot_below, dot])
+        #     if pawn.has_been_moved is False:
+        #         no_of_unmoved_pawns += 1
+        #         for dot in self._dots_list:
+        #             if dot.pawn_on_top is None:
+        #                 possible_moves.append([pawn, dot])
         return possible_moves
 
+    def check_possible_mills(self, player1_pawns, player2_pawns):
+        list1 = [player1_pawns, player2_pawns]
+        return_mills_player1 = []
+        return_mills_player2 = []
+        for player in list1:
+            for pawn in player:
+                connected_dots = pawn.dot_below.connected_dots
+                for dot in connected_dots:
+                    distance_between_two = [pawn.dot_below.position[0]-dot.position[0],
+                                            pawn.dot_below.position[1]-dot.position[1]]
+                    trd_dot = None
+                    for dot_trd in dot.connected_dots:
+                        if dot_trd.position == [dot.position[0]-distance_between_two[0],
+                                                dot.position[1]-distance_between_two[1]]:
+                            trd_dot = dot_trd
+                    if ((dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is pawn.player_no_1
+                       and trd_dot is not None and (trd_dot.pawn_on_top is None or trd_dot.pawn_on_top.player_no_1 is not pawn.player_no_1))
+                       or ((dot.pawn_on_top is None or dot.pawn_on_top.player_no_1 is not pawn.player_no_1)
+                       and trd_dot is not None and trd_dot.pawn_on_top is not None and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1)):
+                        possible_mill = [pawn.dot_below, dot, trd_dot] # sorted([pawn.dot_below, dot, trd_dot], key=lambda x: self._dots_list.index(x))
+                        if possible_mill not in return_mills_player1 and list1.index(player) == 0:
+                            return_mills_player1.append(possible_mill)
+                        elif possible_mill not in return_mills_player2 and list1.index(player) == 1:
+                            return_mills_player2.append(possible_mill)
+
+        return return_mills_player1, return_mills_player2
+
     def make_bot_move(self):
+        self._render_one_more_frame += 1
         if self._bot.random is True:
+            self.bot_random_move()
+            return True
+        else:
+            player1_pawns_on_board = []
+            player2_pawns_on_board = []
+
+            for pawn in self._player1_pawns:
+                if pawn.has_been_moved is True and pawn is not self._holding_pawn and pawn not in player1_pawns_on_board:
+                    player1_pawns_on_board.append(pawn)
+            for pawn in self._player2_pawns:
+                if pawn.has_been_moved is True and pawn is not self._holding_pawn and pawn not in player2_pawns_on_board:
+                    player2_pawns_on_board.append(pawn)
+
+            player1_possible_mills, player2_possible_mills = self.check_possible_mills(player1_pawns_on_board, player2_pawns_on_board)
+
+            done_move = False
+
             if (self._deletion_moves == 0):
                 possible_moves = self.check_possible_moves(self._player1_pawns)
-                move_number = randint(0, len(possible_moves)-1)
-                dots = possible_moves[move_number]
-                if (type(dots[0]) is Pawn):
-                    dots[0].set_position(dots[1].position)
-                    dots[0].pawn_was_moved()
-                    dots[0].set_dot_below(dots[1])
+                if len(player1_possible_mills) > 0:
+                    doable_mills = []
+                    for mill in player1_possible_mills:
+                        for dot in mill:
+                            if dot.pawn_on_top is None:
+                                doable_mills.append(dot)
+                    if len(doable_mills) > 0:
+                        for option in range(len(doable_mills)):
+                            for move in possible_moves:
+                                if move[1].position == doable_mills[option].position:
+                                    if move[0].dot_below is not None:
+                                        move[0].dot_below.set_pawn_on_top(None)
+                                    move[0].set_position(move[1].position)
+                                    move[0].pawn_was_moved()
+                                    move[0].set_dot_below(move[1])
 
-                    dots[1].set_pawn_on_top(dots[0])
-                elif (type(dots[0]) is Dot):
-                    pawn = dots[0].pawn_on_top
-                    pawn.set_position(dots[1].position)
-                    pawn.pawn_was_moved()
-                    pawn.set_dot_below(dots[1])
+                                    move[1].set_pawn_on_top(move[0])
+                                    done_move = True
+                                if done_move is True:
+                                    break
+                            if done_move is True:
+                                break
+                if len(player2_possible_mills) > 0 and done_move is False:
+                    doable_mills = []
+                    for mill in player2_possible_mills:
+                        for dot in mill:
+                            if dot.pawn_on_top is None:
+                                doable_mills.append(dot)
+                    if len(doable_mills) > 0:
+                        for option in range(len(doable_mills)):
+                            for move in possible_moves:
+                                if move[1].position == doable_mills[option].position:
+                                    if move[0].dot_below is not None:
+                                        move[0].dot_below.set_pawn_on_top(None)
+                                    move[0].set_position(move[1].position)
+                                    move[0].pawn_was_moved()
+                                    move[0].set_dot_below(move[1])
 
-                    dots[0].set_pawn_on_top(None)
-                    dots[1].set_pawn_on_top(pawn)
+                                    move[1].set_pawn_on_top(move[0])
+                                    done_move = True
+                                if done_move is True:
+                                    break
+                            if done_move is True:
+                                break
+                if done_move is False:
+                    mill_destroying_moves = []
+                    for move in possible_moves:
+                        if len(move[0].pawns_in_mill_with) > 0:
+                            mill_destroying_moves.append(move)
+                    if len(mill_destroying_moves) < len(possible_moves):
+                        for move in mill_destroying_moves:
+                            if move in possible_moves:
+                                possible_moves.remove(move)
+
+                    mill_allowing_moves = []
+                    for move in possible_moves:
+                        for mill in player2_possible_mills:
+                            for dot in mill:
+                                if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is True and dot.pawn_on_top is move[0]:
+                                    mill_allowing_moves.append(move)
+                    if len(mill_allowing_moves) < len(possible_moves):
+                        for move in mill_allowing_moves:
+                            if move in possible_moves:
+                                possible_moves.remove(move)
+
+                    move_number = randint(0, len(possible_moves)-1)
+                    move = possible_moves[move_number]
+                    if (move[0].dot_below is not None):
+                        move[0].dot_below.set_pawn_on_top(None)
+                    move[0].set_position(move[1].position)
+                    move[0].pawn_was_moved()
+                    move[0].set_dot_below(move[1])
+
+                    move[1].set_pawn_on_top(move[0])
+                    done_move = True
             elif (self._deletion_moves > 0):
+                sleep(1)
                 possible_pawns_to_delete = []
-                for pawn in self._player2_pawns:
-                    if pawn.has_been_moved is True and len(pawn.pawns_in_mill_with) == 0:
+                for pawn in player2_pawns_on_board:
+                    if len(pawn.pawns_in_mill_with) == 0:
                         possible_pawns_to_delete.append(pawn)
+                if len(player2_possible_mills) > 0:
+                    doable_mills = []
+                    for mill in player2_possible_mills:
+                        if mill[2].pawn_on_top is None:
+                            if (len(mill[1].pawn_on_top.pawns_in_mill_with) == 0):
+                                doable_mills.append(mill[1])
+                            elif (len(mill[0].pawn_on_top.pawns_in_mill_with) == 0):
+                                doable_mills.append(mill[0])
+                        if mill[1].pawn_on_top is None:
+                            if (len(mill[2].pawn_on_top.pawns_in_mill_with) == 0):
+                                doable_mills.append(mill[2])
+                            elif (len(mill[0].pawn_on_top.pawns_in_mill_with) == 0):
+                                doable_mills.append(mill[0])
+                        if mill[0].pawn_on_top is None:
+                            if (len(mill[1].pawn_on_top.pawns_in_mill_with) == 0):
+                                doable_mills.append(mill[1])
+                            elif (len(mill[2].pawn_on_top.pawns_in_mill_with) == 0):
+                                doable_mills.append(mill[2])
+                    if len(doable_mills) > 0:
+                        move_number = randint(0, len(doable_mills)-1)
+                        pawn_to_delete = doable_mills[move_number].pawn_on_top
 
-                move_number = randint(0, len(possible_pawns_to_delete)-1)
-                pawn_to_delete = possible_pawns_to_delete[move_number]
+                        self._player2_pawns.remove(pawn_to_delete)
+                        pawn_to_delete.dot_below.set_pawn_on_top(None)
 
-                self._player2_pawns.remove(pawn_to_delete)
-                pawn_to_delete.dot_below.set_pawn_on_top(None)
+                        self._deletion_moves -= 1
+                        done_move = True
+                if len(player1_possible_mills) > 0 and done_move is False:
+                    doable_mills = []
+                    for mill in player1_possible_mills:
+                        for dot in mill:
+                            if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is False and len(dot.pawn_on_top.pawns_in_mill_with) == 0:
+                                doable_mills.append(dot)
+                    if len(doable_mills) > 0:
+                        move_number = randint(0, len(doable_mills)-1)
+                        pawn_to_delete = doable_mills[move_number].pawn_on_top
 
-                self._deletion_moves -= 1
-                self._render_one_more_frame = True
-            self._make_bot_move = False
+                        self._player2_pawns.remove(pawn_to_delete)
+                        pawn_to_delete.dot_below.set_pawn_on_top(None)
+
+                        self._deletion_moves -= 1
+                        done_move = True
+                if done_move is False:
+                    self.bot_random_move()
+                    done_move = True
+                self._render_one_more_frame += 1
+            self._display.type_item_into_display_list([str(len(player1_possible_mills)) + "  " + str(len(player2_possible_mills)), str(len(player1_pawns_on_board)) + "  " + str(len(player2_pawns_on_board))], (5, 3))
+            del player1_pawns_on_board
+            del player2_pawns_on_board
             return True
-        # else:
-        #     return True
+
+    def bot_random_move(self):
+        if (self._deletion_moves == 0):
+            possible_moves = self.check_possible_moves(self._player1_pawns)
+            move_number = randint(0, len(possible_moves)-1)
+            move = possible_moves[move_number]
+            if (move[0].dot_below is not None):
+                move[0].dot_below.set_pawn_on_top(None)
+            move[0].set_position(move[1].position)
+            move[0].pawn_was_moved()
+            move[0].set_dot_below(move[1])
+
+            move[1].set_pawn_on_top(move[0])
+        elif (self._deletion_moves > 0):
+            possible_pawns_to_delete = []
+            for pawn in self._player2_pawns:
+                if pawn.has_been_moved is True and len(pawn.pawns_in_mill_with) == 0:
+                    possible_pawns_to_delete.append(pawn)
+
+            move_number = randint(0, len(possible_pawns_to_delete)-1)
+            pawn_to_delete = possible_pawns_to_delete[move_number]
+
+            self._player2_pawns.remove(pawn_to_delete)
+            pawn_to_delete.dot_below.set_pawn_on_top(None)
+
+            self._deletion_moves -= 1
 
     def keyboard_functionality(self, height: int, width: int):
         if self._key == "KEY_DOWN":
@@ -303,6 +482,7 @@ class GameLord:
 
                     if (self._saved_pos != dot.position and self._deletion_moves == 0):
                         changed_pawns_placement = True
+                        self._render_one_more_frame += 1
                 else:
                     self._holding_pawn.set_position(self._saved_pos)
             self._holding_pawn = None
@@ -327,14 +507,12 @@ class GameLord:
 
                 if self._holding_pawn is None:
                     self._catch = not self._catch
-                    self._render_one_more_frame = True
-
+                    self._render_one_more_frame += 1
                 elif (self._deletion_moves == 0 and (self._holding_pawn.player_no_1 is not self._player1_turn
                                                      or (self._holding_pawn.has_been_moved is True and completed_putting_on_board is False))):
                     self._catch = not self._catch
-                    self._render_one_more_frame = True
                     self._holding_pawn = None
-
+                    self._render_one_more_frame += 1
                 if (self._deletion_moves > 0 and self._holding_pawn is not None
                    and self._holding_pawn.player_no_1 is not self._player1_turn and self._holding_pawn.has_been_moved is True
                    and len(self._holding_pawn.pawns_in_mill_with) == 0):
@@ -346,23 +524,21 @@ class GameLord:
                     self._holding_pawn = None
                     self._deletion_moves -= 1
                     self._catch = not self._catch
-                    self._render_one_more_frame = True
-
+                    self._render_one_more_frame += 1
                     changed_pawns_placement = True  # self.change_turn()
                 elif (self._deletion_moves > 0 and self._holding_pawn is not None
                       and (self._holding_pawn.player_no_1 is self._player1_turn or len(self._holding_pawn.pawns_in_mill_with) != 0
                            or self._holding_pawn.has_been_moved is False)):
                     self._catch = not self._catch
-                    self._render_one_more_frame = True
                     self._holding_pawn = None
-
+                    self._render_one_more_frame += 1
                 if (self._holding_pawn is not None and self._saved_pos is None):
                     self._saved_pos = list(self._holding_pawn.position)
                     self._position_difference = list([self._cursor_x-self._saved_pos[0], self._cursor_y-self._saved_pos[1]])
                     dot = self.check_if_above_dot([self._cursor_x, self._cursor_y])
                     if dot is not None:
                         self._saved_dot = dot
-        if self._make_bot_move is True:
+        if self._bot is not None and self._player1_turn is True:
             changed_pawns_placement = self.make_bot_move()
         self.check_mills()
         self.check_end_of_game(changed_pawns_placement)
@@ -375,7 +551,7 @@ class GameLord:
         self._key = key
 
     def displayed_one_more_frame(self):
-        self._render_one_more_frame = False
+        self._render_one_more_frame -= 1
 
     @property
     def one_more_frame(self):
