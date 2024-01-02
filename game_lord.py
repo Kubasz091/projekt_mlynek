@@ -5,6 +5,7 @@ from pawn_placement_saver import PawnPlacementSaver
 from bot import Bot
 from time import sleep
 
+
 class GameLord:
     def __init__(self, size: int, bot: Bot):
         self._dots_list = []
@@ -126,21 +127,16 @@ class GameLord:
         return_mills = []
         for player in list1:
             for pawn in player:
-                connected_pawns = []
-                if pawn.dot_below is not None:
-                    for dot in pawn.dot_below.connected_dots:
-                        if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is pawn.player_no_1:
-                            connected_pawns.append(dot.pawn_on_top)
-
-                for pawn_connected in connected_pawns:
-                    distance_between_two = [pawn.dot_below.position[0]-pawn_connected.dot_below.position[0],
-                                            pawn.dot_below.position[1]-pawn_connected.dot_below.position[1]]
-                    for pawn_potential in player:
-                        if pawn_potential is not pawn:
-                            distance = [pawn_connected.dot_below.position[0]-pawn_potential.dot_below.position[0],
-                                        pawn_connected.dot_below.position[1]-pawn_potential.dot_below.position[1]]
-                            if (distance == distance_between_two):
-                                potencial_mill = sorted([pawn, pawn_connected, pawn_potential], key=lambda x: self._dots_list.index(x.dot_below))
+                connected_dots = pawn.dot_below.connected_dots
+                for dot in connected_dots:
+                    if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is pawn.player_no_1:
+                        distance_between_two = [pawn.dot_below.position[0]-dot.position[0],
+                                                pawn.dot_below.position[1]-dot.position[1]]
+                        for trd_dot in dot.connected_dots:
+                            if (trd_dot.position == [dot.position[0]-distance_between_two[0],
+                                                     dot.position[1]-distance_between_two[1]]
+                               and trd_dot.pawn_on_top is not None and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1):
+                                potencial_mill = sorted([pawn, dot.pawn_on_top, trd_dot.pawn_on_top], key=lambda x: self._dots_list.index(x.dot_below))
                                 if potencial_mill not in return_mills:
                                     return_mills.append(potencial_mill)
         return return_mills
@@ -217,16 +213,6 @@ class GameLord:
                 for dot in self._dots_list:
                     if dot.pawn_on_top is None:
                         possible_moves.append([pawn, dot])
-        # for pawn in pawns:
-        #     if pawn.has_been_moved is True and no_of_unmoved_pawns == 0:
-        #         for dot in pawn.dot_below.connected_dots:
-        #             if dot.pawn_on_top is None:
-        #                 possible_moves.append([pawn.dot_below, dot])
-        #     if pawn.has_been_moved is False:
-        #         no_of_unmoved_pawns += 1
-        #         for dot in self._dots_list:
-        #             if dot.pawn_on_top is None:
-        #                 possible_moves.append([pawn, dot])
         return possible_moves
 
     def check_possible_mills(self, player1_pawns, player2_pawns):
@@ -248,7 +234,7 @@ class GameLord:
                        and trd_dot is not None and (trd_dot.pawn_on_top is None or trd_dot.pawn_on_top.player_no_1 is not pawn.player_no_1))
                        or ((dot.pawn_on_top is None or dot.pawn_on_top.player_no_1 is not pawn.player_no_1)
                        and trd_dot is not None and trd_dot.pawn_on_top is not None and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1)):
-                        possible_mill = [pawn.dot_below, dot, trd_dot] # sorted([pawn.dot_below, dot, trd_dot], key=lambda x: self._dots_list.index(x))
+                        possible_mill = sorted([pawn.dot_below, dot, trd_dot], key=lambda x: self._dots_list.index(x))
                         if possible_mill not in return_mills_player1 and list1.index(player) == 0:
                             return_mills_player1.append(possible_mill)
                         elif possible_mill not in return_mills_player2 and list1.index(player) == 1:
