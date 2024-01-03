@@ -1,4 +1,4 @@
-from board import Board, Pawn, Dot
+from board import Pawn, Dot
 from graphic_data import GraphicData
 import curses
 from time import sleep
@@ -39,7 +39,6 @@ class Display:
         - size: The size of the game board.
         - game_lord: The GameLord object controlling the game logic.
         """
-        self._board = Board(size)
         self._graphic_data = GraphicData(size)
         self._display_list = []
         self._game_lord = game_lord

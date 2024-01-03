@@ -1,93 +1,59 @@
 # Projekt_Młynek
 
+## Dane autora
+- Imie: Jakub
+- Nazwisko: Szuzbda
+- Wydział: Eiti, PW
 
+## Cel i Opis Projektu
+- Cel: 
+    Napisać program grający w Młynek. Powinna być możliwość rozgrywki na planszy wynikającej z wybranej na początku liczby pionków (kształt planszy wynika z tej liczby, ale nie reguły gry - można próbować znaleźć taki opis planszy, żeby kod do gry był wspólny).
 
-## Getting started
+    Powinna być możliwość gry:
+    - dwóch osób ze sobą,
+    - osoby z komputerem.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+    Program powinien kontrolować poprawność wykonywanych ruchów. Interfejs z użytkownikiem może być tekstowy.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+    Algorytm gry przez komputer powinien mieć dwa tryby:
+    - komputer wykonuje losowy ruch spośród dostępnych,
+    - komputer na bazie prostych reguł wybiera "najlepszy" ruch.
 
-## Add your files
+- Opis: 
+    W moim projekcie zostały zrealizowane wymienione powyżej w rzeczy. Jest możliwość gry na planszy wynikającej z wybranej na początku ilości pionków, reguły gry nie wynikają z rozmiaru planszy. Jest możliwość gry dwóch osób ze sobą, albo z botem, zależnie którą opcję wybierze się na początku działania programu. Zrobiłem graficzny interfejs bazujący na bibliotece curses znajdującej się domyślnie w pythonie na linuxie. Jej używam do wyświetlania planszy, jak i wszytskich wizualnych informacji. Dane potrzebne do budowy plansz podzieliłem na graficzne zbudwane z znaków (alt keys) i pozycyjne. Zanajdują się w pliku graphic_data.py. Program kontroluje poprawność ruchów, w taki sposób, że nie pozwala wykonać ruchu który jest nie poprawny, jeżeli spróbujemy odstawić pionek na pole, albo w miejscu w którym nie powinien się znaleźć wróci na swoje poprzednie miejsce. Interfejs z użytkownikiem jest graficzny, lecz również w terminalu, sterowanie przebiega w następujący sposób: 
+    - q - zakończenie programu, 
+    - e - próba podniesienia pionka (lub usunięcia), 
+    - strzałki - poruszanie się po ekranie kursorem.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+    Bot ma dwa tryby, które wybierane są, jeśli wybierzemy, że chcemy grać z botem: randomowy, oraz kierowany prostymi zasadami:
 
-```
-cd existing_repo
-git remote add origin https://gitlab-stud.elka.pw.edu.pl/jszubzda/projekt_mlynek.git
-git branch -M main
-git push -uf origin main
-```
+    Przy ruchu normalnym:
+    - sprawdza, czy jest w stanie ułożyć młynek,
+    - jeśli nie, to czy jest w stanie zablokować młynek, który najprawdopodobniej zostanie ułożony przez przeciwnika,
+    - jeśli nie to wykonuje losowy ruch z puli możliwych, usuwając uprzednio, jeżeli to nie usunie wszystkiech ruchów te które niszczyłyby jego młynki, albo umożliwiały zrobienie młynka przciwnikowi w następnym ruchu.
 
-## Integrate with your tools
+    Przy ruchu usuwającym:
+    - spradza, czy przeciwnik ma 2 pionki które w następnym ruchu mogą zostać ułożone w młynek, jeśli tak to usuwa losowy z nich,
+    - jeśli nie to sprawdza czy któryś z potencjalnych młynków bota jest blokowany, przez pionek gracza jeśli tak to go usuwa,
+    - jeśli nic nie znajdzie to usuwa losowy pionek nie znajdujący się obecjnie w młynku, chyba że wszystkie się znajdują to wtedy losowy.
 
-- [ ] [Set up project integrations](https://gitlab-stud.elka.pw.edu.pl/jszubzda/projekt_mlynek/-/settings/integrations)
+## Struktura Klas
+- Pawn: każdy pionek jest typu Pawn, ma pozycje i przynależność do danego z graczy, przechowuje również pionki z którymi jest w młynku, jeżeli jest i pole na którym się znajduje, jeżeli już został ruszony.
+- Dot: przechowuje stoją pozycje na planczy, oraz z którymi polami jest połączona, licząc od lewego górnego rogu, od lewej do prawej, wiersz pól po wierszu oraz czy ma jakiś pionek na sobie.
+- Bot: znajduje się w tej klasie logika zachowań bota, albo jej brak w przypadku ruchów losowych :D. 
+- Display: klasa ta zajmuje się wyświetlaniem planszy, pionków, itd. w terminalu za pomocą biblioteki curses.
+- GameLord: jest to klasa w której znajdują się metody prawie wszystkiego co się dzieje w grze niezwiązanego z wyświetlaniem, czy pamiętaniem ruchów.
+- GraphicData: jest to klasa która zawiera całą grafikę w grze poza napisami i kursorem, została przezemnie stworzona w celu napisania w niej danych potrzebnych do budowy planszy, i logiki na niej, jako że nie była to jakaś ogromna ilość danych, oraz potrzbny był mi łatwy dostęp do danych w celu ich zmiany, kiedy coś nie działało nie robiłem tego w pliku json.
+- ProgramRunner: rusza program, celem jego stowrzenia, było zapamietanie i przekazanie danych wprowadzonych przez użytkownika na starcie dalej, tak aby dało się to zgrać z biblioteką curses.
+- PawnPlacementSaver: klasa ta zapisuje położenia pionków na planczy jako listę 0, 1 i 2 odpowiednio 0 - brak pionka na polu, 1 - pionek gracza 1, 2 - pionek gracza 2, oraz od ilu ruchów nie został ułożony młynek w skrócie sprawdza czy nie doszło do remisu.
 
-## Collaborate with your team
+## Przewodnik Użytkownika
+- Krok 1: sklonować repozytorium.
+- Krok 2: upewnić się, że zostało ono otworzone na maszynie wirtualnej, lub systemie linux.
+- Krok 3: otworzyć plik main.py oraz go uruchomić.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Refleksja
+- Wykorzystane Prace: przykłady wykorzystania biblioteki curses, tablica altkeys z strony: [AltKody](https://fsymbols.com/pl/klawiatura/windows/alt-kody/lista/) oraz edytor grafik altkodes: [Fsymbols](https://fsymbols.com/draw/).
+- Niespełnione Cele: zrobienie drugiego sposobu sterowania, który "skakałby" od możliwości do możliwości, odkrycie jakiegoś sposobu na generowanie plansz, bez potrzeby zapisywania ich danych, na podstawie jakiś zasad, któych nie udało mi się odkryć.
+- Napotkane Przeszkody: ułożenie planszy, i zrobienie logiki gry.
+- Zmiany w Porównaniu do Planowanego Rozwiązania: na początku chciałem zrobić generowanie plansz na podstawie jakiegoś wzoru, ale nie udało mi się nic wymyślić, więc zapisałem je ręcznie, ragment po fragmencie.
