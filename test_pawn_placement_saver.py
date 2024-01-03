@@ -10,20 +10,20 @@ def test_save_placement():
     assert saver._saved_placements == [[4, 5, 6], [7, 8, 9]]
 
 
-def test_check_if_repeted():
+def test_check_if_repeated():
     saver = PawnPlacementSaver(2)
     saver.save_placement([1, 2, 3])
     saver.save_placement([1, 2, 3])
-    assert saver.check_if_repeted([1, 2, 3]) == 2
+    assert saver.check_if_repeated([1, 2, 3]) == 2
     saver.save_placement([4, 5, 6])
-    assert saver.check_if_repeted([4, 5, 6]) == 1
-    assert saver.check_if_repeted([1, 2, 3]) == 1
-    assert saver.check_if_repeted([7, 8, 9]) == 0
+    assert saver.check_if_repeated([4, 5, 6]) == 1
+    assert saver.check_if_repeated([1, 2, 3]) == 1
+    assert saver.check_if_repeated([7, 8, 9]) == 0
 
 
-def test_mill_occured():
+def test_mill_occurred():
     saver = PawnPlacementSaver(2)
-    saver.mill_occured()
+    saver.mill_occurred()
     assert saver._mill_counter == 0
 
 

@@ -205,7 +205,7 @@ class GameLord:
             if mill not in self._active_mills:
                 self.add_mill(mill)
                 self.grant_deletion_move()
-                self._placement_saver.mill_occured()
+                self._placement_saver.mill_occurred()
 
         for mill_saved in self._active_mills:
             if mill_saved not in found_mills:
