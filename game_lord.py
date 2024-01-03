@@ -341,7 +341,7 @@ class GameLord:
 
                 if (self._deletion_moves > 0 and self._holding_pawn is not None
                    and self._holding_pawn.player_no_1 is not self._player1_turn and self._holding_pawn.has_been_moved is True
-                   and (len(self._holding_pawn.pawns_in_mill_with) == 0  or has_pawns_not_in_mill is False)):
+                   and (len(self._holding_pawn.pawns_in_mill_with) == 0 or has_pawns_not_in_mill is False)):
                     if self._holding_pawn.player_no_1 is True:
                         self._player1_pawns.remove(self._holding_pawn)
                     elif self._holding_pawn.player_no_1 is False:

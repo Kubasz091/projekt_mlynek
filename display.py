@@ -135,10 +135,12 @@ class Display:
 
             is_off = self._game_lord.game_mechanics()
 
-            if self._game_lord.player1_turn is True:
+            if self._game_lord.player1_turn is True and self._game_lord.deletion_moves == 0:
                 player_str = 'PLAYER 1 TURN'
-            else:
+            elif self._game_lord.player1_turn is False and self._game_lord.deletion_moves == 0:
                 player_str = 'PLAYER 2 TURN'
+            elif self._game_lord.deletion_moves > 0:
+                player_str = 'DELETION MOVE'
             statusbarstr = "Press 'q' to exit | Press 'e' to move pawns | Pos: {}, {},   {}".format(int(cursor_x/2), cursor_y, player_str)
 
             i = 0
@@ -173,12 +175,12 @@ class Display:
                     temp_pos[1] += 1
                 del temp_pos
 
+            wrapper.attron(curses.A_BOLD)
             wrapper.attron(curses.color_pair(5))
             wrapper.addstr(height-1, 0, statusbarstr)
             wrapper.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
             wrapper.attroff(curses.color_pair(5))
 
-            wrapper.attron(curses.A_BOLD)
             wrapper.attron(curses.color_pair(2))
             wrapper.addstr(self._headline_y-3, 4, "Player 1")
             wrapper.addstr(self._headline_y-2, 4, " pawns: ")
@@ -208,8 +210,7 @@ class Display:
             wrapper.refresh()
 
         # if terminal size is not big enough to fit the whole board notify the user
-        elif (height < len(baord_str)+1 and width < len(baord_str[0]) and self._game_lord._player1_won is False
-              and self._game_lord._player2_won is False and self._game_lord._draw is False):
+        else:
             x_message = width - len(baord_str[0])
             y_message = height - (len(baord_str)+1)
             x_message = min(0, x_message)
@@ -240,7 +241,8 @@ class Display:
             wrapper.move(height - 1, width - 1)
 
             wrapper.refresh()
-        elif self._game_lord._player1_won is True:
+        if self._game_lord._player1_won is True:
+            wrapper.clear()
             start_x = int((width - len(self._graphic_data.graphics_data['player1_won'][0]))/2)
             start_y = int((height - len(self._graphic_data.graphics_data['player1_won']))/2)
             i = 0
@@ -252,7 +254,8 @@ class Display:
             sleep(5)
             exit()
 
-        elif self._game_lord._player2_won is True:
+        if self._game_lord._player2_won is True:
+            wrapper.clear()
             start_x = int((width - len(self._graphic_data.graphics_data['player2_won'][0]))/2)
             start_y = int((height - len(self._graphic_data.graphics_data['player2_won']))/2)
             i = 0
@@ -263,7 +266,8 @@ class Display:
             wrapper.refresh()
             sleep(5)
             exit()
-        elif self._game_lord._draw is True:
+        if self._game_lord._draw is True:
+            wrapper.clear()
             start_x = int((width - len(self._graphic_data.graphics_data['draw'][0]))/2)
             start_y = int((height - len(self._graphic_data.graphics_data['draw']))/2)
             i = 0
