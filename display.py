@@ -15,6 +15,8 @@ class Display:
         self._graphic_data = GraphicData(size)
         self._display_list = []
         self._game_lord = game_lord
+        self._headline_y = None
+        self._headline_x = None
 
         self.create_full_display_list()
 
@@ -86,10 +88,10 @@ class Display:
         if (self._graphic_data.size % pawn_columns) != 0:
             no_of_pawns_in_a_column += 1
 
-        start_y = int((board_height - (no_of_pawns_in_a_column * (pawn_height + 1))) / 2)+2
-        headline_x = x_display_size - (pawn_columns * (pawn_width + 2) + 4)
+        self._headline_y = int((board_height - (no_of_pawns_in_a_column * (pawn_height + 1))) / 2)+2
+        self._headline_x = x_display_size - (pawn_columns * (pawn_width + 2) + 4)+2
 
-        temp_pos = [4, start_y]
+        temp_pos = [4, self._headline_y]
         for pawn in range(self._graphic_data.size):
             if (temp_pos[0] > (single_player_panel_x_size-1)):
                 temp_pos[1] += pawn_height + 1
@@ -97,7 +99,7 @@ class Display:
             self._game_lord.add_player1_pawn(Pawn(temp_pos, True))
             temp_pos[0] += (pawn_width + 2)
 
-        temp_pos = [x_display_size - (pawn_width+2+2), start_y]
+        temp_pos = [x_display_size - (pawn_width+2+2), self._headline_y]
         for pawn in range(self._graphic_data.size):
             if (temp_pos[0] < (x_display_size - single_player_panel_x_size-1)):
                 temp_pos[1] += pawn_height + 1
@@ -121,9 +123,6 @@ class Display:
 
         self.type_miltiple_items(display_dict)
 
-        self.type_item_into_display_list(["Player 1", " pawns: "], (4, start_y-3))
-        self.type_item_into_display_list(["Player 2", " pawns: "], (headline_x, start_y-3))
-
     def draw_display(self, wrapper):
         wrapper.clear()
         height, width = wrapper.getmaxyx()
@@ -134,9 +133,13 @@ class Display:
 
             cursor_x, cursor_y = self._game_lord.keyboard_functionality(len(baord_str)+1, len(baord_str[0]))
 
-            is_blue = self._game_lord.game_mechanics()
+            is_off = self._game_lord.game_mechanics()
 
-            statusbarstr = "Press 'q' to exit | Press 'e' to move pawns | Pos: {}, {}".format(int(cursor_x/2), cursor_y)
+            if self._game_lord.player1_turn is True:
+                player_str = 'PLAYER 1 TURN'
+            else:
+                player_str = 'PLAYER 2 TURN'
+            statusbarstr = "Press 'q' to exit | Press 'e' to move pawns | Pos: {}, {},   {}".format(int(cursor_x/2), cursor_y, player_str)
 
             i = 0
             for row in baord_str:
@@ -175,7 +178,19 @@ class Display:
             wrapper.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
             wrapper.attroff(curses.color_pair(5))
 
-            if (is_blue is True):
+            wrapper.attron(curses.A_BOLD)
+            wrapper.attron(curses.color_pair(2))
+            wrapper.addstr(self._headline_y-3, 4, "Player 1")
+            wrapper.addstr(self._headline_y-2, 4, " pawns: ")
+            wrapper.attroff(curses.color_pair(2))
+
+            wrapper.attron(curses.color_pair(3))
+            wrapper.addstr(self._headline_y-3, self._headline_x, "Player 2")
+            wrapper.addstr(self._headline_y-2, self._headline_x, " pawns: ")
+            wrapper.attroff(curses.color_pair(3))
+            wrapper.attroff(curses.A_BOLD)
+
+            if (is_off is True):
                 if self._game_lord.player1_turn is True:
                     wrapper.attron(curses.color_pair(2))
                     wrapper.addstr(cursor_y, cursor_x, "██")

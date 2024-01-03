@@ -17,6 +17,8 @@ class GameLord:
 
         if bot is True:
             self._bot = Bot(bot_mode, self)
+        else:
+            self._bot = None
 
         self._display = Display(size, self)
         self.connect_dots(self._dots_list)
@@ -267,7 +269,7 @@ class GameLord:
         return self._cursor_x, self._cursor_y
 
     def game_mechanics(self):
-        is_blue = True
+        is_off = True
         changed_pawns_placement = False
         if self._catch is True and self._holding_pawn is not None:
             self._holding_pawn.set_position([self._cursor_x-self._position_difference[0],
@@ -301,7 +303,7 @@ class GameLord:
             self._saved_dot = None
 
         elif (self._catch is True):
-            is_blue = False
+            is_off = False
             completed_putting_on_board = True
             if self._holding_pawn is None:
                 self._holding_pawn = self.check_if_above_pawn([self._cursor_x, self._cursor_y])
@@ -366,7 +368,7 @@ class GameLord:
             changed_pawns_placement = self._bot.make_move(self._player1_pawns, self._player2_pawns)
         self.check_mills()
         self.check_end_of_game(changed_pawns_placement)
-        return is_blue
+        return is_off
 
     def display_frame(self, wrapper):
         self._display.draw_display(wrapper)
