@@ -1,19 +1,20 @@
 import curses
-from time import sleep, time
+from time import time
 from game_lord import GameLord
-from bot import Bot
+
 
 class ProgramRunner:
     def __init__(self):
         chose_size = False
         self._size = 0
         self._bot = False
+        self._bot_mode = None
 
         while chose_size is False:
             try:
                 self._size = int(input("Choose ammount of pawns that each player will have (3, 6, 9, 12) --> "))
             except Exception:
-                pass
+                self._size = 5
             if self._size in [3, 6, 9, 12]:
                 chose_size = True
             else:
@@ -45,11 +46,7 @@ class ProgramRunner:
                     print("Typed in something, that's not 0 or 1 :(")
 
     def run(self, wrapper):
-        bot = None
-        if self._bot is True:
-            bot = Bot(self._bot_mode)
-
-        game_lord = GameLord(self._size, bot)
+        game_lord = GameLord(self._size, self._bot, self._bot_mode)
         wrapper.nodelay(True)
 
         wrapper.clear()

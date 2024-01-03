@@ -131,7 +131,7 @@ class Display:
 
         if (height >= len(baord_str)+1 and width >= len(baord_str[0]) and self._game_lord._player1_won is False
            and self._game_lord._player2_won is False and self._game_lord._draw is False):
-            # keyboard functionality
+
             cursor_x, cursor_y = self._game_lord.keyboard_functionality(len(baord_str)+1, len(baord_str[0]))
 
             is_blue = self._game_lord.game_mechanics()
@@ -170,18 +170,10 @@ class Display:
                     temp_pos[1] += 1
                 del temp_pos
 
-            # Render status bar
             wrapper.attron(curses.color_pair(5))
             wrapper.addstr(height-1, 0, statusbarstr)
             wrapper.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
             wrapper.attroff(curses.color_pair(5))
-
-            whstr = f'{self._game_lord._deletion_moves}'
-            whstr2 = 'no mills'
-            if (len(self._game_lord._active_mills) > 0):
-                whstr2 = "Mill: dot{}, dot{}, dot{}".format(self._game_lord._dots_list.index(self._game_lord._active_mills[0][0].dot_below), self._game_lord._dots_list.index(self._game_lord._active_mills[0][1].dot_below), self._game_lord._dots_list.index(self._game_lord._active_mills[0][2].dot_below))
-            wrapper.addstr(0, 1, whstr)
-            wrapper.addstr(1, 1, whstr2)
 
             if (is_blue is True):
                 if self._game_lord.player1_turn is True:
@@ -197,7 +189,6 @@ class Display:
                 wrapper.addstr(cursor_y, cursor_x, "██")
                 wrapper.attroff(curses.color_pair(4))
 
-            # Refresh the screen and move the cursor for rendering so it is not next to my pointer
             wrapper.move(height - 1, width - 1)
             wrapper.refresh()
 
