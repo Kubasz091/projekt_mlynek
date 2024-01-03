@@ -5,7 +5,7 @@ class PawnPlacementSaver:
         self._mill_counter = 0
 
     def save_placement(self, placement: list):
-        if len(self._saved_placements) > self._depth:
+        if len(self._saved_placements) >= self._depth:
             self._saved_placements.remove(self._saved_placements[0])
         self._saved_placements.append(placement)
 

@@ -24,10 +24,10 @@ class WrongBoardSize(Exception):
 class Board:
     def __init__(self, size: int):
         possible_sizes = [3, 6, 9, 12]
-        no_of_sqr = [1, 2, 3, 3][possible_sizes.index(size)]
 
         if size not in possible_sizes:
             raise WrongBoardSize(number=size, possible_numbers=possible_sizes)
+        no_of_sqr = [1, 2, 3, 3][possible_sizes.index(size)]
         self._size = size
         self._terminal_size = calc_terminal_board_size(no_of_sqr)
         self._no_of_sqr = no_of_sqr

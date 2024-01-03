@@ -46,17 +46,17 @@ class ProgramRunner:
                     print("Typed in something, that's not 0 or 1 :(")
 
     def run(self, wrapper):
-        game_lord = GameLord(self._size, self._bot, self._bot_mode)
+        self._game_lord = GameLord(self._size, self._bot, self._bot_mode)
         wrapper.nodelay(True)
 
         wrapper.clear()
-        game_lord.display_frame(wrapper)
+        self._game_lord.display_frame(wrapper)
         wrapper.refresh()
 
         time_started = time()
         time_to_display = 0
 
-        while (game_lord.key != "q"):
+        while (self._game_lord.key != "q"):
             current_time = time() - time_started
 
             if (current_time > time_to_display):
@@ -65,14 +65,14 @@ class ProgramRunner:
                     key = wrapper.getkey()
                 except Exception:
                     pass
-                game_lord.set_key(key)
+                self._game_lord.set_key(key)
                 if (key is not None):
-                    game_lord.display_frame(wrapper)
+                    self._game_lord.display_frame(wrapper)
                     time_to_display = current_time + 0.02
-                elif (game_lord.one_more_frame > 0):
-                    game_lord.display_frame(wrapper)
+                elif (self._game_lord.one_more_frame > 0):
+                    self._game_lord.display_frame(wrapper)
                     time_to_display = current_time + 0.02
-                    game_lord.displayed_one_more_frame()
+                    self._game_lord.displayed_one_more_frame()
 
 
 if __name__ == "__main__":
