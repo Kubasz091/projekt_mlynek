@@ -6,7 +6,42 @@ from bot import Bot
 
 
 class GameLord:
+    """
+    The GameLord class represents the main game controller for the Młynek game.
+
+    Attributes:
+        _dots_list (list): A list of Dot objects representing the dots on the game board.
+        _player1_pawns (list): A list of Pawn objects representing the pawns of player 1.
+        _player2_pawns (list): A list of Pawn objects representing the pawns of player 2.
+        _active_mills (list): A list of lists containing Pawn objects representing the active mills on the game board.
+        _player1_turn (bool): A boolean indicating whether it is currently player 1's turn.
+        _started_player1 (bool): A boolean indicating whether player 1 started the game.
+        _render_one_more_frame (int): An integer indicating whether to render one more frame.
+        _bot (Bot or None): An instance of the Bot class representing the game bot, or None if there is no bot.
+        _display (Display): An instance of the Display class representing the game display.
+        _placement_saver (PawnPlacementSaver): An instance of the PawnPlacementSaver class for saving pawn placements.
+        _cursor_x (int): An integer representing the x-coordinate of the cursor.
+        _cursor_y (int): An integer representing the y-coordinate of the cursor.
+        _catch (bool): A boolean indicating whether a pawn catch is in progress.
+        _deletion_moves (int): An integer representing the number of deletion moves granted.
+        _player1_won (bool): A boolean indicating whether player 1 has won the game.
+        _player2_won (bool): A boolean indicating whether player 2 has won the game.
+        _draw (bool): A boolean indicating whether the game ended in a draw.
+        _key (str or None): A string representing the last keyboard key pressed, or None if no key has been pressed.
+        _saved_pos (list or None): A list representing the saved position, or None if no position has been saved.
+        _position_difference (list or None): A list representing the position difference, or None if no difference has been calculated.
+        _holding_pawn (Pawn or None): An instance of the Pawn class representing the pawn being held, or None if no pawn is being held.
+        _saved_dot (Dot or None): An instance of the Dot class representing the saved dot, or None if no dot has been saved.
+    """
     def __init__(self, size: int, bot: bool, bot_mode: bool):
+        """
+        Initializes a new instance of the GameLord class.
+
+        Args:
+            size (int): The size of the game board.
+            bot (bool): A boolean indicating whether to enable the game bot.
+            bot_mode (bool): A boolean indicating the mode of the game bot.
+        """
         self._dots_list = []
         self._player1_pawns = []
         self._player2_pawns = []
@@ -42,19 +77,49 @@ class GameLord:
         self._saved_dot = None
 
     def change_turn(self):
+        """
+        Changes the turn to the next player.
+        """
         self._player1_turn = not self._player1_turn
         self._placement_saver.count_round_without_mill()
 
     def add_dot(self, dot: Dot):
+        """
+        Adds a Dot object to the game board.
+
+        Args:
+            dot (Dot): The Dot object to add.
+        """
         self._dots_list.append(dot)
 
     def add_player1_pawn(self, pawn: Pawn):
+        """
+        Adds a Pawn object to player 1's pawns.
+
+        Args:
+            pawn (Pawn): The Pawn object to add.
+        """
         self._player1_pawns.append(pawn)
 
     def add_player2_pawn(self, pawn: Pawn):
+        """
+        Adds a Pawn object to player 2's pawns.
+
+        Args:
+            pawn (Pawn): The Pawn object to add.
+        """
         self._player2_pawns.append(pawn)
 
     def check_if_above_pawn(self, position: list):
+        """
+        Checks if the given position is above a pawn.
+
+        Args:
+            position (list): The position to check.
+
+        Returns:
+            Pawn or None: The Pawn object if a pawn is found, None otherwise.
+        """
         pawn_return = None
         for player in [self._player1_pawns, self._player2_pawns]:
             for pawn in player:
@@ -67,6 +132,15 @@ class GameLord:
         return pawn_return
 
     def check_if_above_dot(self, position: list):
+        """
+        Checks if the given position is above a dot.
+
+        Args:
+            position (list): The position to check.
+
+        Returns:
+            Dot or None: The Dot object if a dot is found, None otherwise.
+        """
         dot_return = None
         for dot in self._dots_list:
             pos_left_corner = list(dot.position)
@@ -78,6 +152,12 @@ class GameLord:
         return dot_return
 
     def connect_dots(self, dots_list: list):
+        """
+        Connects the dots on the game board.
+
+        Args:
+            dots_list (list): A list of Dot objects representing the dots on the game board.
+        """
         keys = self._display._graphic_data.board_data["connected_dots"].keys()
         for key in keys:
             for dot in self._display._graphic_data.board_data["connected_dots"][key]:
@@ -85,6 +165,15 @@ class GameLord:
                 dots_list[dot].set_connection(dots_list[key])
 
     def check_move(self, dot: Dot):
+        """
+        Checks if a move to the given dot is valid.
+
+        Args:
+            dot (Dot): The Dot object to check.
+
+        Returns:
+            bool: True if the move is valid, False otherwise.
+        """
         if (self._holding_pawn.player_no_1 is True):
             if (dot in self._saved_dot.connected_dots or len(self._player1_pawns) < 4):
                 return True
@@ -97,6 +186,9 @@ class GameLord:
                 return False
 
     def check_mills(self):
+        """
+        Checks for mills on the game board and updates the active mills.
+        """
         player1_pawns_on_board = []
         player2_pawns_on_board = []
 
@@ -125,6 +217,16 @@ class GameLord:
                     self.del_mill(mill_saved)
 
     def search_mills(self, player1_pawns, player2_pawns):
+        """
+        Searches for mills on the game board.
+
+        Args:
+            player1_pawns (list): A list of Pawn objects representing player 1's pawns.
+            player2_pawns (list): A list of Pawn objects representing player 2's pawns.
+
+        Returns:
+            list: A list of lists containing Pawn objects representing the found mills.
+        """
         list1 = [player1_pawns, player2_pawns]
         return_mills = []
         for player in list1:
@@ -144,6 +246,12 @@ class GameLord:
         return return_mills
 
     def add_mill(self, mill):
+        """
+        Adds a mill to the active mills.
+
+        Args:
+            mill (list): A list of Pawn objects representing the mill.
+        """
         pawn1, pawn2, pawn3 = mill
         pawn1.make_mill(pawn2, pawn3)
         pawn2.make_mill(pawn1, pawn3)
@@ -151,6 +259,12 @@ class GameLord:
         self._active_mills.append(mill)
 
     def del_mill(self, mill):
+        """
+        Removes a mill from the active mills.
+
+        Args:
+            mill (list): A list of Pawn objects representing the mill.
+        """
         pawn1, pawn2, pawn3 = mill
         pawn1.destroy_mill()
         pawn2.destroy_mill()
@@ -158,9 +272,18 @@ class GameLord:
         self._active_mills.remove(mill)
 
     def grant_deletion_move(self):
+        """
+        Grants deletion move to the current player
+        """
         self._deletion_moves += 1
 
     def check_end_of_game(self, changed_pawns_placement: bool):
+        """
+        Checks if the game has ended.
+
+        Args:
+            changed_pawns_placement (bool): A boolean indicating whether the pawns placement has changed.
+        """
         player1_moved = False
         player2_moved = False
 
@@ -182,12 +305,18 @@ class GameLord:
             self._placement_saver.save_placement(current_board_placement)
             self.change_turn()
 
-            if self._placement_saver.check_if_repeted(current_board_placement) >= 3:
+            if self._placement_saver.check_if_repeated(current_board_placement) >= 3:
                 self._draw = True
             elif self._placement_saver.mill_counter >= self._placement_saver.depth:
                 self._draw = True
 
     def build_board_placement_list(self):
+        """
+        Builds a list representing the current board placement.
+
+        Returns:
+            list: A list representing the current board placement.
+        """
         return_list = []
         for dot in self._dots_list:
             if dot.pawn_on_top is None:
@@ -199,6 +328,15 @@ class GameLord:
         return return_list
 
     def check_possible_moves(self, pawns: list):
+        """
+        Checks the possible moves for the given pawns.
+
+        Args:
+            pawns (list): A list of Pawn objects to check.
+
+        Returns:
+            list: A list of lists containing the possible moves.
+        """
         possible_moves = []
         unmoved_pawns = []
 
@@ -218,6 +356,16 @@ class GameLord:
         return possible_moves
 
     def check_possible_mills(self, player1_pawns, player2_pawns):
+        """
+        Checks the possible mills for the given pawns.
+
+        Args:
+            player1_pawns (list): A list of Pawn objects representing player 1's pawns.
+            player2_pawns (list): A list of Pawn objects representing player 2's pawns.
+
+        Returns:
+            tuple: A tuple containing two lists of lists representing the possible mills for player 1 and player 2.
+        """
         list1 = [player1_pawns, player2_pawns]
         return_mills_player1 = []
         return_mills_player2 = []
@@ -248,6 +396,13 @@ class GameLord:
         return return_mills_player1, return_mills_player2
 
     def keyboard_functionality(self, height: int, width: int):
+        """
+        Handles the keyboard functionality for the game.
+
+        Args:
+            height (int): The height of the game display.
+            width (int): The width of the game display.
+        """
         if self._key == "KEY_DOWN":
             self._cursor_y = self._cursor_y + 1
         elif self._key == "KEY_UP":
@@ -269,6 +424,12 @@ class GameLord:
         return self._cursor_x, self._cursor_y
 
     def game_mechanics(self):
+        """
+        Executes the game mechanics, including pawn movement, capturing, and checking for mills.
+
+        Returns:
+            bool: True if the e key has been activated, False if it wasn't
+        """
         is_off = True
         changed_pawns_placement = False
         if self._catch is True and self._holding_pawn is not None:
@@ -371,26 +532,65 @@ class GameLord:
         return is_off
 
     def display_frame(self, wrapper):
+        """
+        Draw the current game state on the display.
+
+        Parameters:
+        wrapper (object): A wrapper object for the display.
+        """
         self._display.draw_display(wrapper)
 
     def set_key(self, key):
+        """
+        Set the key for the game.
+
+        Parameters:
+        key (str): The key to be set.
+        """
         self._key = key
 
     def displayed_one_more_frame(self):
+        """
+        Decrease the count of frames to be rendered extra by one.
+        """
         self._render_one_more_frame -= 1
 
     @property
     def deletion_moves(self):
+        """
+        Return the deletion moves in the game.
+
+        Returns:
+        int: The number of deletion moves.
+        """
         return self._deletion_moves
 
     @property
     def one_more_frame(self):
+        """
+        Return the count of frames to be rendered.
+
+        Returns:
+        int: The count of frames to be rendered.
+        """
         return self._render_one_more_frame
 
     @property
     def key(self):
+        """
+        Return the key of the game.
+
+        Returns:
+        str: The key of the game.
+        """
         return self._key
 
     @property
     def player1_turn(self):
+        """
+        Check if it's player 1's turn.
+
+        Returns:
+        bool: True if it's player 1's turn, False otherwise.
+        """
         return self._player1_turn

@@ -3,11 +3,28 @@ from time import sleep
 
 
 class Bot:
+    """
+    A class to represent a bot player in a game.
+    """
     def __init__(self, random_moves: bool, game_lord):
+        """
+        Initialize the bot with its strategy and GameLord.
+
+        Parameters:
+        random_moves (bool): If True, the bot makes random moves. Otherwise, it follows a specific strategy.
+        game_lord (GameLord): The ruler of the game.
+        """
         self._random_moves = random_moves
         self._game_lord = game_lord
 
     def make_move(self, player1_pawns, player2_pawns):
+        """
+        Make a move for the bot.
+
+        Parameters:
+        player1_pawns (list): The pawns of player 1.
+        player2_pawns (list): The pawns of player 2.
+        """
         self._game_lord._render_one_more_frame += 1
         if self._random_moves is True:
             self.random_move(player1_pawns, player2_pawns)
@@ -151,6 +168,13 @@ class Bot:
             return True
 
     def random_move(self, player1_pawns, player2_pawns):
+        """
+        Make a random move for the bot.
+
+        Parameters:
+        player1_pawns (list): The pawns of player 1.
+        player2_pawns (list): The pawns of player 2.
+        """
         if (self._game_lord.deletion_moves == 0):
             possible_moves = self._game_lord.check_possible_moves(player1_pawns)
             move_number = randint(0, len(possible_moves)-1)
@@ -182,4 +206,10 @@ class Bot:
 
     @property
     def random(self):
+        """
+        Return the bot's strategy.
+
+        Returns:
+        bool: If True, the bot makes random moves. Otherwise, it follows a specific strategy.
+        """
         return self._random_moves

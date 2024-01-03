@@ -10,7 +10,35 @@ class CoordinatesError(Exception):
 
 
 class Display:
+    """
+    The Display class represents the graphical display of the game board and pawns.
+
+    Attributes:
+    - _board: The Board object representing the game board.
+    - _graphic_data: The GraphicData object containing graphical data for pawns and the board.
+    - _display_list: A list representing the current state of the display.
+    - _game_lord: The GameLord object controlling the game logic.
+    - _headline_y: The y-coordinate of the headline text.
+    - _headline_x: The x-coordinate of the headline text.
+
+    Methods:
+    - __init__(self, size: int, game_lord): Initializes the Display object.
+    - pawn_str(self, pawn: Pawn): Returns the graphical representation of a pawn.
+    - board_str(self): Returns the current state of the display as a list of strings.
+    - create_display_list(self, size: tuple): Creates an empty display list with the given size.
+    - type_item_into_display_list(self, item: list, coordinates: tuple): Types an item into the display list at the specified coordinates.
+    - type_miltiple_items(self, items_with_positions: dict): Types multiple items into the display list at their respective positions.
+    - create_full_display_list(self): Creates the full display list with the game board, pawns, and other graphical elements.
+    - draw_display(self, wrapper): Draws the display on the screen using the curses library.
+    """
     def __init__(self, size: int, game_lord):
+        """
+        Initializes the Display object.
+
+        Parameters:
+        - size: The size of the game board.
+        - game_lord: The GameLord object controlling the game logic.
+        """
         self._board = Board(size)
         self._graphic_data = GraphicData(size)
         self._display_list = []
@@ -28,9 +56,24 @@ class Display:
         curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
     def pawn_str(self, pawn: Pawn):
+        """
+        Returns the graphical representation of a pawn.
+
+        Parameters:
+        - pawn: The Pawn object representing the pawn.
+
+        Returns:
+        - A list of strings representing the graphical representation of the pawn.
+        """
         return list(self._graphic_data.graphics_data[f'pawn_player{int(not pawn.player_no_1)}'])
 
     def board_str(self):
+        """
+        Returns the current state of the display as a list of strings.
+
+        Returns:
+        - A list of strings representing the current state of the display.
+        """
         return_str = []
         for row in self._display_list:
             _ = ''
@@ -40,6 +83,15 @@ class Display:
         return return_str
 
     def create_display_list(self, size: tuple):
+        """
+        Creates an empty display list with the given size.
+
+        Parameters:
+        - size: A tuple representing the size of the display list.
+
+        Returns:
+        - A list representing the empty display list.
+        """
         return_list = []
         for row in range(size[1]):
             _ = []
@@ -49,6 +101,16 @@ class Display:
         return return_list
 
     def type_item_into_display_list(self, item: list, coordinates: tuple):
+        """
+        Types an item into the display list at the specified coordinates.
+
+        Parameters:
+        - item: A list representing the item to be typed into the display list.
+        - coordinates: A tuple representing the coordinates where the item should be typed.
+
+        Raises:
+        - CoordinatesError: If the coordinates are negative or the item goes outside the display bounds.
+        """
         if (coordinates[0] < 0 or coordinates[1] < 0):
             raise CoordinatesError("Coordinates cannot be negative!")
         if ((coordinates[0] + len(item[0])) > len(self._display_list[0])
@@ -64,12 +126,21 @@ class Display:
             temp_pos[0] = coordinates[0]
 
     def type_miltiple_items(self, items_with_positions: dict):
+        """
+        Types multiple items into the display list at their respective positions.
+
+        Parameters:
+        - items_with_positions: A dictionary containing items as keys and their positions as values.
+        """
         indv_items_to_print = list(items_with_positions.keys())
         for item in indv_items_to_print:
             for position in items_with_positions[item]:
                 self.type_item_into_display_list(self._graphic_data.graphics_data[item], position)
 
     def create_full_display_list(self):
+        """
+        Creates the full display list with the game board, pawns, and other graphical elements.
+        """
         board_height = self._graphic_data.board_data["dot"][-1][1] + 3 + 4
         board_width = self._graphic_data.board_data["dot"][2][0] + 6
 
@@ -124,6 +195,12 @@ class Display:
         self.type_miltiple_items(display_dict)
 
     def draw_display(self, wrapper):
+        """
+        Draws the display on the screen using the curses library.
+
+        Parameters:
+        - wrapper: The curses window object used for drawing.
+        """
         wrapper.clear()
         height, width = wrapper.getmaxyx()
         baord_str = self.board_str()

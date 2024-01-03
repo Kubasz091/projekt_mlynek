@@ -1,5 +1,24 @@
 class GraphicData:
+    """
+    A class that represents the graphic data for the game.
+
+    Attributes:
+    - graphics_data (dict): A dictionary containing the graphics data for different elements of the game.
+    - size (int): The size of the game board.
+    - board_data (dict): A dictionary containing the positons for pieces of the board
+
+    Methods:
+    - board_data(): Returns the board data for the current size.
+    - graphics_data(): Returns the graphics data for the game.
+    - size(): Returns the size of the game board.
+    """
     def __init__(self, size: int):
+        """
+        Initializes the GraphicData object.
+
+        Parameters:
+        - size (int): The size of the game board.
+        """
         graphics_dict = {
             "dot": [' ▄██▄ ',
                     '▐████▌',
@@ -223,12 +242,30 @@ class GraphicData:
 
     @property
     def board_data(self):
+        """
+        Returns the board data for the current size.
+
+        Returns:
+        - dict: The board data for the current size.
+        """
         return self._board_data
 
     @property
     def graphics_data(self):
+        """
+        Returns the graphics data for the game.
+
+        Returns:
+        - dict: The graphics data for the game.
+        """
         return self._graphics_data
 
     @property
     def size(self):
+        """
+        Returns the size of the game board.
+
+        Returns:
+        - int: The size of the game board.
+        """
         return self._size
