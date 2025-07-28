@@ -23,11 +23,13 @@ class Bot:
                 if pawn.has_been_moved is True:
                     player2_pawns_on_board.append(pawn)
 
-            player1_possible_mills, player2_possible_mills = self._game_lord.check_possible_mills(player1_pawns_on_board, player2_pawns_on_board)
+            player1_possible_mills, player2_possible_mills = self._game_lord.check_possible_mills(
+                player1_pawns_on_board, player2_pawns_on_board
+            )
 
             done_move = False
 
-            if (self._game_lord.deletion_moves == 0):
+            if self._game_lord.deletion_moves == 0:
                 possible_moves = self._game_lord.check_possible_moves(player1_pawns)
                 if len(player1_possible_mills) > 0:
                     doable_mills = []
@@ -87,16 +89,20 @@ class Bot:
                     for move in possible_moves:
                         for mill in player2_possible_mills:
                             for dot in mill:
-                                if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is True and dot.pawn_on_top is move[0]:
+                                if (
+                                    dot.pawn_on_top is not None
+                                    and dot.pawn_on_top.player_no_1 is True
+                                    and dot.pawn_on_top is move[0]
+                                ):
                                     mill_allowing_moves.append(move)
                     if len(mill_allowing_moves) < len(possible_moves):
                         for move in mill_allowing_moves:
                             if move in possible_moves:
                                 possible_moves.remove(move)
 
-                    move_number = randint(0, len(possible_moves)-1)
+                    move_number = randint(0, len(possible_moves) - 1)
                     move = possible_moves[move_number]
-                    if (move[0].dot_below is not None):
+                    if move[0].dot_below is not None:
                         move[0].dot_below.set_pawn_on_top(None)
                     move[0].set_position(move[1].position)
                     move[0].pawn_was_moved()
@@ -104,7 +110,7 @@ class Bot:
 
                     move[1].set_pawn_on_top(move[0])
                     done_move = True
-            elif (self._game_lord.deletion_moves > 0):
+            elif self._game_lord.deletion_moves > 0:
                 sleep(1)
                 possible_pawns_to_delete = []
                 for pawn in player2_pawns_on_board:
@@ -118,10 +124,13 @@ class Bot:
                                 other_two_dots = mill
                                 other_two_dots.remove(dot)
                                 for dot_two in other_two_dots:
-                                    if dot_two.pawn_on_top in possible_pawns_to_delete or len(possible_pawns_to_delete) == 0:
+                                    if (
+                                        dot_two.pawn_on_top in possible_pawns_to_delete
+                                        or len(possible_pawns_to_delete) == 0
+                                    ):
                                         doable_deletions.append(dot_two)
                     if len(doable_deletions) > 0:
-                        move_number = randint(0, len(doable_deletions)-1)
+                        move_number = randint(0, len(doable_deletions) - 1)
                         pawn_to_delete = doable_deletions[move_number].pawn_on_top
 
                         player2_pawns.remove(pawn_to_delete)
@@ -133,10 +142,14 @@ class Bot:
                     doable_deletions = []
                     for mill in player1_possible_mills:
                         for dot in mill:
-                            if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is False and len(dot.pawn_on_top.pawns_in_mill_with) == 0:
+                            if (
+                                dot.pawn_on_top is not None
+                                and dot.pawn_on_top.player_no_1 is False
+                                and len(dot.pawn_on_top.pawns_in_mill_with) == 0
+                            ):
                                 doable_deletions.append(dot)
                     if len(doable_deletions) > 0:
-                        move_number = randint(0, len(doable_deletions)-1)
+                        move_number = randint(0, len(doable_deletions) - 1)
                         pawn_to_delete = doable_deletions[move_number].pawn_on_top
 
                         player2_pawns.remove(pawn_to_delete)
@@ -151,18 +164,18 @@ class Bot:
             return True
 
     def random_move(self, player1_pawns, player2_pawns):
-        if (self._game_lord.deletion_moves == 0):
+        if self._game_lord.deletion_moves == 0:
             possible_moves = self._game_lord.check_possible_moves(player1_pawns)
-            move_number = randint(0, len(possible_moves)-1)
+            move_number = randint(0, len(possible_moves) - 1)
             move = possible_moves[move_number]
-            if (move[0].dot_below is not None):
+            if move[0].dot_below is not None:
                 move[0].dot_below.set_pawn_on_top(None)
             move[0].set_position(move[1].position)
             move[0].pawn_was_moved()
             move[0].set_dot_below(move[1])
 
             move[1].set_pawn_on_top(move[0])
-        elif (self._game_lord.deletion_moves > 0):
+        elif self._game_lord.deletion_moves > 0:
             possible_pawns_to_delete = []
             for pawn in player2_pawns:
                 if pawn.has_been_moved is True and len(pawn.pawns_in_mill_with) == 0:
@@ -172,7 +185,7 @@ class Bot:
                 for pawn in player2_pawns:
                     if pawn.has_been_moved is True:
                         possible_pawns_to_delete.append(pawn)
-            move_number = randint(0, len(possible_pawns_to_delete)-1)
+            move_number = randint(0, len(possible_pawns_to_delete) - 1)
             pawn_to_delete = possible_pawns_to_delete[move_number]
 
             player2_pawns.remove(pawn_to_delete)

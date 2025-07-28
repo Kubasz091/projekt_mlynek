@@ -9,9 +9,9 @@ def guess_what_user_meant(number: int, possible_numbers: list):
 
 
 def calc_terminal_board_size(no_of_sqr: int):
-    '''
+    """
     returns (x, y) sizes in terminal characters
-    '''
+    """
     return ((15 + (12 * (no_of_sqr - 1))) * 2, 15 + (12 * (no_of_sqr - 1)))
 
 
@@ -33,7 +33,7 @@ class Board:
         self._no_of_sqr = no_of_sqr
 
     def __str__(self):
-        return f'Board of size: {self._size}'
+        return f"Board of size: {self._size}"
 
     @property
     def size(self):
@@ -57,7 +57,7 @@ class Pawn:
         self._dot_below = None
 
     def __str__(self):
-        return f'This is pawn of player {self._player_no_1}, at position: x:{int(self._position[0]/2)}, y:{self._position[1]}'
+        return f"This is pawn of player {self._player_no_1}, at position: x:{int(self._position[0] / 2)}, y:{self._position[1]}"
 
     def set_position(self, position: list):
         self._position = position
@@ -85,7 +85,7 @@ class Pawn:
 
     @property
     def position(self):
-        return (self._position)
+        return self._position
 
     @property
     def dot_below(self):

@@ -1,0 +1,17 @@
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "C4", "B"]
+ignore = []
+
+[tool.black]
+line-length = 100
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra-q"
+testpaths = ["tests"]
+
+[tool.mypy]
+ignore_missing_imports = true

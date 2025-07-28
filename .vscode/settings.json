@@ -1,0 +1,30 @@
+{
+    // General Editor Settings
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.ruff": "explicit",
+        "source.organizeImports.ruff": "explicit"
+    },
+    // Python Specific Settings
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.wordBasedSuggestions": "off"
+    },
+    // Ruff Configuration (native language server)
+    "python.linting.ruffEnabled": true,
+    "python.linting.ruffArgs": [
+        "--select=ALL"
+    ],
+    // Pylance/Pyright Type Checking (Stricter)
+    "python.analysis.typeCheckingMode": "basic",
+    // Pytest Configuration
+    "python.testing.pytestArgs": [
+        "tests" // Assumes your tests are in a ’tests’ directory
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    // Mypy Configuration
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true,
+    "terminal.integrated.fontSize": 12,
+}

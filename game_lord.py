@@ -1,8 +1,9 @@
 from random import getrandbits
-from board import Pawn, Dot
+
+from board import Dot, Pawn
+from bot import Bot
 from display import Display
 from pawn_placement_saver import PawnPlacementSaver
-from bot import Bot
 
 
 class GameLord:
@@ -59,10 +60,26 @@ class GameLord:
         for player in [self._player1_pawns, self._player2_pawns]:
             for pawn in player:
                 pos_left_corner = pawn.position
-                pos_right_corner = [pos_left_corner[0] + len(self._display._graphic_data.graphics_data[f'pawn_player{int(pawn.player_no_1)}'][0]),
-                                    pos_left_corner[1] + len(self._display._graphic_data.graphics_data[f'pawn_player{int(pawn.player_no_1)}'])]
-                if (position[0] >= pos_left_corner[0] and position[0] < pos_right_corner[0]
-                   and position[1] >= pos_left_corner[1] and position[1] < pos_right_corner[1]):
+                pos_right_corner = [
+                    pos_left_corner[0]
+                    + len(
+                        self._display._graphic_data.graphics_data[
+                            f"pawn_player{int(pawn.player_no_1)}"
+                        ][0]
+                    ),
+                    pos_left_corner[1]
+                    + len(
+                        self._display._graphic_data.graphics_data[
+                            f"pawn_player{int(pawn.player_no_1)}"
+                        ]
+                    ),
+                ]
+                if (
+                    position[0] >= pos_left_corner[0]
+                    and position[0] < pos_right_corner[0]
+                    and position[1] >= pos_left_corner[1]
+                    and position[1] < pos_right_corner[1]
+                ):
                     pawn_return = pawn
         return pawn_return
 
@@ -70,10 +87,16 @@ class GameLord:
         dot_return = None
         for dot in self._dots_list:
             pos_left_corner = list(dot.position)
-            pos_right_corner = [pos_left_corner[0] + len(self._display._graphic_data.graphics_data['dot'][0]),
-                                pos_left_corner[1] + len(self._display._graphic_data.graphics_data['dot'])]
-            if (position[0] >= pos_left_corner[0] and position[0] < pos_right_corner[0]
-               and position[1] >= pos_left_corner[1] and position[1] < pos_right_corner[1]):
+            pos_right_corner = [
+                pos_left_corner[0] + len(self._display._graphic_data.graphics_data["dot"][0]),
+                pos_left_corner[1] + len(self._display._graphic_data.graphics_data["dot"]),
+            ]
+            if (
+                position[0] >= pos_left_corner[0]
+                and position[0] < pos_right_corner[0]
+                and position[1] >= pos_left_corner[1]
+                and position[1] < pos_right_corner[1]
+            ):
                 dot_return = dot
         return dot_return
 
@@ -85,13 +108,13 @@ class GameLord:
                 dots_list[dot].set_connection(dots_list[key])
 
     def check_move(self, dot: Dot):
-        if (self._holding_pawn.player_no_1 is True):
-            if (dot in self._saved_dot.connected_dots or len(self._player1_pawns) < 4):
+        if self._holding_pawn.player_no_1 is True:
+            if dot in self._saved_dot.connected_dots or len(self._player1_pawns) < 4:
                 return True
             else:
                 return False
-        elif (self._holding_pawn.player_no_1 is False):
-            if (dot in self._saved_dot.connected_dots or len(self._player2_pawns) < 4):
+        elif self._holding_pawn.player_no_1 is False:
+            if dot in self._saved_dot.connected_dots or len(self._player2_pawns) < 4:
                 return True
             else:
                 return False
@@ -131,14 +154,28 @@ class GameLord:
             for pawn in player:
                 connected_dots = pawn.dot_below.connected_dots
                 for dot in connected_dots:
-                    if dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is pawn.player_no_1:
-                        distance_between_two = [pawn.dot_below.position[0]-dot.position[0],
-                                                pawn.dot_below.position[1]-dot.position[1]]
+                    if (
+                        dot.pawn_on_top is not None
+                        and dot.pawn_on_top.player_no_1 is pawn.player_no_1
+                    ):
+                        distance_between_two = [
+                            pawn.dot_below.position[0] - dot.position[0],
+                            pawn.dot_below.position[1] - dot.position[1],
+                        ]
                         for trd_dot in dot.connected_dots:
-                            if (trd_dot.position == [dot.position[0]-distance_between_two[0],
-                                                     dot.position[1]-distance_between_two[1]]
-                               and trd_dot.pawn_on_top is not None and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1):
-                                potencial_mill = sorted([pawn, dot.pawn_on_top, trd_dot.pawn_on_top], key=lambda x: self._dots_list.index(x.dot_below))
+                            if (
+                                trd_dot.position
+                                == [
+                                    dot.position[0] - distance_between_two[0],
+                                    dot.position[1] - distance_between_two[1],
+                                ]
+                                and trd_dot.pawn_on_top is not None
+                                and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1
+                            ):
+                                potencial_mill = sorted(
+                                    [pawn, dot.pawn_on_top, trd_dot.pawn_on_top],
+                                    key=lambda x: self._dots_list.index(x.dot_below),
+                                )
                                 if potencial_mill not in return_mills:
                                     return_mills.append(potencial_mill)
         return return_mills
@@ -171,9 +208,13 @@ class GameLord:
         for pawn in self._player2_pawns:
             if pawn.has_been_moved is True:
                 player2_moved = True
-        if len(self._player1_pawns) < 3 or (len(self.check_possible_moves(self._player1_pawns)) == 0 and player1_moved is True):
+        if len(self._player1_pawns) < 3 or (
+            len(self.check_possible_moves(self._player1_pawns)) == 0 and player1_moved is True
+        ):
             self._player2_won = True
-        elif len(self._player2_pawns) < 3 or (len(self.check_possible_moves(self._player2_pawns)) == 0 and player2_moved is True):
+        elif len(self._player2_pawns) < 3 or (
+            len(self.check_possible_moves(self._player2_pawns)) == 0 and player2_moved is True
+        ):
             self._player1_won = True
 
         if self._deletion_moves == 0 and changed_pawns_placement is True:
@@ -225,21 +266,37 @@ class GameLord:
             for pawn in player:
                 connected_dots = pawn.dot_below.connected_dots
                 for dot in connected_dots:
-                    distance_between_two = [pawn.dot_below.position[0]-dot.position[0],
-                                            pawn.dot_below.position[1]-dot.position[1]]
+                    distance_between_two = [
+                        pawn.dot_below.position[0] - dot.position[0],
+                        pawn.dot_below.position[1] - dot.position[1],
+                    ]
                     trd_dot = None
                     for dot_trd in dot.connected_dots:
-                        if dot_trd.position == [dot.position[0]-distance_between_two[0],
-                                                dot.position[1]-distance_between_two[1]]:
+                        if dot_trd.position == [
+                            dot.position[0] - distance_between_two[0],
+                            dot.position[1] - distance_between_two[1],
+                        ]:
                             trd_dot = dot_trd
-                    if ((dot.pawn_on_top is not None and dot.pawn_on_top.player_no_1 is pawn.player_no_1
-                       and
-                       trd_dot is not None and (trd_dot.pawn_on_top is None or trd_dot.pawn_on_top.player_no_1 is not pawn.player_no_1))
-                       or
-                       ((dot.pawn_on_top is None or dot.pawn_on_top.player_no_1 is not pawn.player_no_1)
-                       and
-                       trd_dot is not None and trd_dot.pawn_on_top is not None and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1)):
-                        possible_mill = sorted([pawn.dot_below, dot, trd_dot], key=lambda x: self._dots_list.index(x))
+                    if (
+                        dot.pawn_on_top is not None
+                        and dot.pawn_on_top.player_no_1 is pawn.player_no_1
+                        and trd_dot is not None
+                        and (
+                            trd_dot.pawn_on_top is None
+                            or trd_dot.pawn_on_top.player_no_1 is not pawn.player_no_1
+                        )
+                    ) or (
+                        (
+                            dot.pawn_on_top is None
+                            or dot.pawn_on_top.player_no_1 is not pawn.player_no_1
+                        )
+                        and trd_dot is not None
+                        and trd_dot.pawn_on_top is not None
+                        and trd_dot.pawn_on_top.player_no_1 is pawn.player_no_1
+                    ):
+                        possible_mill = sorted(
+                            [pawn.dot_below, dot, trd_dot], key=lambda x: self._dots_list.index(x)
+                        )
                         if possible_mill not in return_mills_player1 and list1.index(player) == 0:
                             return_mills_player1.append(possible_mill)
                         elif possible_mill not in return_mills_player2 and list1.index(player) == 1:
@@ -257,14 +314,14 @@ class GameLord:
         elif self._key == "KEY_LEFT":
             self._cursor_x = self._cursor_x - 2
 
-        elif self._key == 'e':
+        elif self._key == "e":
             self._catch = not self._catch
 
         self._cursor_x = max(4, self._cursor_x)
-        self._cursor_x = min(width-6, self._cursor_x)
+        self._cursor_x = min(width - 6, self._cursor_x)
 
         self._cursor_y = max(2, self._cursor_y)
-        self._cursor_y = min(height-4, self._cursor_y)
+        self._cursor_y = min(height - 4, self._cursor_y)
 
         return self._cursor_x, self._cursor_y
 
@@ -272,19 +329,23 @@ class GameLord:
         is_off = True
         changed_pawns_placement = False
         if self._catch is True and self._holding_pawn is not None:
-            self._holding_pawn.set_position([self._cursor_x-self._position_difference[0],
-                                             self._cursor_y-self._position_difference[1]])
+            self._holding_pawn.set_position(
+                [
+                    self._cursor_x - self._position_difference[0],
+                    self._cursor_y - self._position_difference[1],
+                ]
+            )
 
-        if (self._catch is False):
-            if (self._saved_pos is not None and self._holding_pawn is not None):
+        if self._catch is False:
+            if self._saved_pos is not None and self._holding_pawn is not None:
                 dot = self.check_if_above_dot([self._cursor_x, self._cursor_y])
                 move_possible = True
 
                 if self._saved_dot is not None and dot is not None:
                     move_possible = self.check_move(dot)
 
-                if (dot is not None and dot.pawn_on_top is None and move_possible is True):
-                    if (self._saved_dot is not None):
+                if dot is not None and dot.pawn_on_top is None and move_possible is True:
+                    if self._saved_dot is not None:
                         self._saved_dot.set_pawn_on_top(None)
                     self._holding_pawn.set_position(dot.position)
                     self._holding_pawn.pawn_was_moved()
@@ -292,7 +353,7 @@ class GameLord:
 
                     dot.set_pawn_on_top(self._holding_pawn)
 
-                    if (self._saved_pos != dot.position and self._deletion_moves == 0):
+                    if self._saved_pos != dot.position and self._deletion_moves == 0:
                         changed_pawns_placement = True
                         self._render_one_more_frame += 1
                 else:
@@ -302,29 +363,31 @@ class GameLord:
             self._position_difference = None
             self._saved_dot = None
 
-        elif (self._catch is True):
+        elif self._catch is True:
             is_off = False
             completed_putting_on_board = True
             if self._holding_pawn is None:
                 self._holding_pawn = self.check_if_above_pawn([self._cursor_x, self._cursor_y])
 
-                if (self._player1_turn is True):
+                if self._player1_turn is True:
                     for pawn in self._player1_pawns:
-                        if (pawn.has_been_moved is False):
+                        if pawn.has_been_moved is False:
                             completed_putting_on_board = False
-                elif (self._player1_turn is False):
+                elif self._player1_turn is False:
                     for pawn in self._player2_pawns:
-                        if (pawn.has_been_moved is False):
+                        if pawn.has_been_moved is False:
                             completed_putting_on_board = False
 
                 if self._holding_pawn is None:
                     self._catch = not self._catch
                     self._render_one_more_frame += 1
-                elif (self._deletion_moves == 0
-                      and
-                      (self._holding_pawn.player_no_1 is not self._player1_turn
-                       or
-                       (self._holding_pawn.has_been_moved is True and completed_putting_on_board is False))):
+                elif self._deletion_moves == 0 and (
+                    self._holding_pawn.player_no_1 is not self._player1_turn
+                    or (
+                        self._holding_pawn.has_been_moved is True
+                        and completed_putting_on_board is False
+                    )
+                ):
                     self._catch = not self._catch
                     self._holding_pawn = None
                     self._render_one_more_frame += 1
@@ -339,9 +402,16 @@ class GameLord:
                         if len(pawn.pawns_in_mill_with) == 0 and pawn.has_been_moved is True:
                             has_pawns_not_in_mill = True
 
-                if (self._deletion_moves > 0 and self._holding_pawn is not None
-                   and self._holding_pawn.player_no_1 is not self._player1_turn and self._holding_pawn.has_been_moved is True
-                   and (len(self._holding_pawn.pawns_in_mill_with) == 0 or has_pawns_not_in_mill is False)):
+                if (
+                    self._deletion_moves > 0
+                    and self._holding_pawn is not None
+                    and self._holding_pawn.player_no_1 is not self._player1_turn
+                    and self._holding_pawn.has_been_moved is True
+                    and (
+                        len(self._holding_pawn.pawns_in_mill_with) == 0
+                        or has_pawns_not_in_mill is False
+                    )
+                ):
                     if self._holding_pawn.player_no_1 is True:
                         self._player1_pawns.remove(self._holding_pawn)
                     elif self._holding_pawn.player_no_1 is False:
@@ -352,15 +422,23 @@ class GameLord:
                     self._catch = not self._catch
                     self._render_one_more_frame += 1
                     changed_pawns_placement = True
-                elif (self._deletion_moves > 0 and self._holding_pawn is not None
-                      and (self._holding_pawn.player_no_1 is self._player1_turn or len(self._holding_pawn.pawns_in_mill_with) != 0
-                           or self._holding_pawn.has_been_moved is False)):
+                elif (
+                    self._deletion_moves > 0
+                    and self._holding_pawn is not None
+                    and (
+                        self._holding_pawn.player_no_1 is self._player1_turn
+                        or len(self._holding_pawn.pawns_in_mill_with) != 0
+                        or self._holding_pawn.has_been_moved is False
+                    )
+                ):
                     self._catch = not self._catch
                     self._holding_pawn = None
                     self._render_one_more_frame += 1
-                if (self._holding_pawn is not None and self._saved_pos is None):
+                if self._holding_pawn is not None and self._saved_pos is None:
                     self._saved_pos = list(self._holding_pawn.position)
-                    self._position_difference = list([self._cursor_x-self._saved_pos[0], self._cursor_y-self._saved_pos[1]])
+                    self._position_difference = list(
+                        [self._cursor_x - self._saved_pos[0], self._cursor_y - self._saved_pos[1]]
+                    )
                     dot = self.check_if_above_dot([self._cursor_x, self._cursor_y])
                     if dot is not None:
                         self._saved_dot = dot
