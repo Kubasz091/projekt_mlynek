@@ -1,6 +1,3 @@
-from typing import Any
-
-
 class Validator:
     def __init__(self, name=None):
         self.name = name
@@ -16,16 +13,20 @@ class Validator:
         instance.__dict__[self.name] = self.check(value)
 
 
-class TypedList(Validator):
+class Typed(Validator):
     expected_type = object
-    container_type = list
 
     @classmethod
     def check(cls, value):
-        if not isinstance(value, cls.container_type):
-            raise TypeError(f"Expected {cls.container_type.__name__}")
-        if not all(isinstance(item, cls.expected_type) for item in value):
-            raise TypeError(f"All items must be {cls.expected_type.__name__}")
+        if isinstance(cls.expected_type, tuple):
+            if not isinstance(value, cls.expected_type):
+                type_names = " or ".join(t.__name__ for t in cls.expected_type)
+                raise TypeError(f"Expected {type_names}, got {type(value).__name__}")
+        else:
+            if not isinstance(value, cls.expected_type):
+                raise TypeError(
+                    f"Expected {cls.expected_type.__name__}, got {type(value).__name__}"
+                )
         return super().check(value)
 
 
@@ -45,23 +46,73 @@ class RectangularList(Validator):
         return super().check(value)
 
 
+class FixedLengthContainer(Validator):
+    expected_length = 0
+
+    @classmethod
+    def check(cls, value):
+        if len(value) != cls.expected_length:
+            raise ValueError(f"Expected container of length {cls.expected_length}")
+        return super().check(value)
+
+
+class PositiveContainer(Validator):
+    @classmethod
+    def check(cls, value):
+        if not all(item >= 0 for item in value):
+            raise ValueError("All items must be non-negative")
+        return super().check(value)
+
+
+class TypedContainer(Validator):
+    expected_type = object
+    container_type = object
+
+    @classmethod
+    def check(cls, value):
+        if not isinstance(value, cls.container_type):
+            raise TypeError(f"Expected {cls.container_type.__name__}")
+        if isinstance(cls.expected_type, tuple):
+            if not all(isinstance(item, cls.expected_type) for item in value):  # type: ignore
+                type_names = " or ".join(t.__name__ for t in cls.expected_type)
+                raise TypeError(f"All items must be {type_names}")
+        else:
+            if not all(isinstance(item, cls.expected_type) for item in value):  # type: ignore
+                raise TypeError(f"All items must be {cls.expected_type.__name__}")
+        return super().check(value)
+
+
+class TypedList(TypedContainer):
+    container_type = list
+
+
+class TypedTuple(TypedContainer):
+    container_type = tuple
+
+
 class StringList(TypedList):
     expected_type = str
+
+
+class IntTuple(TypedTuple):
+    expected_type = int
+
+
+class TerminalPosition(IntTuple, PositiveContainer, FixedLengthContainer):
+    expected_length = 2
+
 
 class RectangularStringList(StringList, RectangularList, NonEmpty):
     pass
 
 
-
 if __name__ == "__main__":
-    class TestClass:
-        txt = RectangularStringList()
 
-        def __repr__(self) -> str:
-            return '\n'.join(self.txt) + '\n' # type: ignore
+    class TestClass:
+        pos = TerminalPosition()
 
     obj = TestClass()
 
-    obj.txt = []
+    obj.pos = (1, 2)
 
-    print(obj)
+    # print(obj[0])

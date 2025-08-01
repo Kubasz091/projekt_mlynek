@@ -1,8 +1,11 @@
-from typing_extensions import Self
-from data_loaders.terminal_texture import TerminalTexture
 import json
 
-class TextureRegistry():
+from typing_extensions import Self
+
+from data_loaders.terminal_texture import TerminalTexture
+
+
+class TextureRegistry:
     _instance = None
     _initialized = False
 
@@ -18,11 +21,11 @@ class TextureRegistry():
 
     def load(self, path: str) -> None:
         try:
-            with open(path, 'r') as file:
+            with open(path) as file:
                 texture_data = json.load(file)
 
             for name, data in texture_data.items():
-                self._textures[name] = TerminalTexture(data)
+                self._textures[name] = TerminalTexture(data["graphics"], data["size"])
             self._loaded = True
 
         except FileNotFoundError as e:
@@ -34,10 +37,12 @@ class TextureRegistry():
 
     def __getitem__(self, texture_name: str) -> TerminalTexture:
         if not self._loaded:
-            raise RuntimeError(f'Textures not loaded. Call load_from_file() first.')
+            raise RuntimeError("Textures not loaded. Call load_from_file() first.")
 
         if texture_name not in self._textures:
-            raise KeyError(f"Texture '{texture_name}' not found. Available textures: {list(self._textures.keys())}")
+            raise KeyError(
+                f"Texture '{texture_name}' not found. Available textures: {list(self._textures.keys())}"
+            )
 
         return self._textures[texture_name]
 
