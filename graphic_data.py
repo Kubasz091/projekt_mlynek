@@ -2,22 +2,15 @@ import csv
 import json
 import os
 
+from data_loaders.texture_registry import TextureRegistry
 
 class GraphicData:
     def __init__(self, size: int):
-        self._graphics_data = self._load_graphics_from_json()
-        self._size = size
+        self._graphics_data = TextureRegistry()
+        self._graphics_data.load(f"/home/jszubzda/projekt_mlynek/graphic_data/graphics.json")
+
         self._board_data = self._load_board_data_from_csv(size)
-
-    def _load_graphics_from_json(self) -> dict:
-        """Load graphics data from JSON file."""
-        json_path = "/home/jszubzda/projekt_mlynek/graphic_data/graphics.json"
-
-        if not os.path.exists(json_path):
-            raise FileNotFoundError(f"Graphics JSON file not found: {json_path}")
-
-        with open(json_path, encoding="utf-8") as jsonfile:
-            return json.load(jsonfile)
+        self._size = size
 
     def _load_board_data_from_csv(self, size: int) -> dict:
         """Load board data from CSV file based on board size."""
