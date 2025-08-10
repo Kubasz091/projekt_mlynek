@@ -13,6 +13,11 @@ class Validator:
         instance.__dict__[self.name] = self.check(value)
 
 
+#
+#
+#
+
+
 class Typed(Validator):
     expected_type = object
 
@@ -82,6 +87,24 @@ class TypedContainer(Validator):
         return super().check(value)
 
 
+#
+#
+#
+class PositiveInt(Typed):
+    expected_type = int
+
+    @classmethod
+    def check(cls, value):
+        if value < 0:
+            raise ValueError("Value must be non-negative")
+        return super().check(value)
+
+
+#
+#
+#
+
+
 class TypedList(TypedContainer):
     container_type = list
 
@@ -98,21 +121,28 @@ class IntTuple(TypedTuple):
     expected_type = int
 
 
+#
+#
+#
+#
+#
+
+
 class TerminalPosition(IntTuple, PositiveContainer, FixedLengthContainer):
     expected_length = 2
+
+    @classmethod
+    def check(cls, value):
+        try:
+            return super().check(value)
+        except TypeError as e:
+            try:
+                return super().check(tuple(value))
+            except TypeError:
+                raise TypeError(
+                    f"Expected a tuple of two integers, got {type(value).__name__}"
+                ) from e
 
 
 class RectangularStringList(StringList, RectangularList, NonEmpty):
     pass
-
-
-if __name__ == "__main__":
-
-    class TestClass:
-        pos = TerminalPosition()
-
-    obj = TestClass()
-
-    obj.pos = (1, 2)
-
-    # print(obj[0])

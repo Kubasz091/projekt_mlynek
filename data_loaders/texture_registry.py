@@ -2,7 +2,7 @@ import json
 
 from typing_extensions import Self
 
-from data_loaders.terminal_texture import TerminalTexture
+from data_loaders.terminal_texture import Texture
 
 
 class TextureRegistry:
@@ -15,7 +15,7 @@ class TextureRegistry:
         return cls._instance
 
     def __init__(self) -> None:
-        self._textures: dict[str, TerminalTexture] = {}
+        self._textures: dict[str, Texture] = {}
         self._loaded = False
         TextureRegistry._initialized = True
 
@@ -25,7 +25,7 @@ class TextureRegistry:
                 texture_data = json.load(file)
 
             for name, data in texture_data.items():
-                self._textures[name] = TerminalTexture(data["graphics"], data["size"])
+                self._textures[name] = Texture(data["graphics"], tuple(data["size"]))
             self._loaded = True
 
         except FileNotFoundError as e:
@@ -35,7 +35,7 @@ class TextureRegistry:
         except Exception as e:
             raise RuntimeError(f"Unexpected error loading texture file: {path}: {e}") from e
 
-    def __getitem__(self, texture_name: str) -> TerminalTexture:
+    def __getitem__(self, texture_name: str) -> Texture:
         if not self._loaded:
             raise RuntimeError("Textures not loaded. Call load_from_file() first.")
 
@@ -51,3 +51,10 @@ class TextureRegistry:
 
     def list_textures(self) -> list[str]:
         return list(self._textures.keys())
+
+
+if __name__ == "__main__":
+    registry = TextureRegistry()
+    registry.load("graphic_data/graphics.json")
+
+    print("Available textures:", registry.list_textures())

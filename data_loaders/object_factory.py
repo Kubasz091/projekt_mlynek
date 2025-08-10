@@ -1,6 +1,7 @@
 from typing_extensions import Self
 
 
+# after consideration I do not think it will be useful, but leaving it for now
 class ObjectFactory:
     _instance = None
     _initialized = False
@@ -11,3 +12,4 @@ class ObjectFactory:
         return cls._instance
 
     def __init__(self) -> None:
+        pass

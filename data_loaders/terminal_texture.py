@@ -1,12 +1,21 @@
+from copy import copy
+
 from utils.validators import RectangularStringList
 
 
-class TerminalTexture:
+class Texture:
     texture: list[str] = RectangularStringList()  # type: ignore
 
-    def __init__(self, texture: list[str], size: list[int]) -> None:
+    def __init__(self, texture: list[str], size: tuple[int, int] | None = None) -> None:
         self.texture = texture
-        self._size = (size[0], size[1])
+
+        # (y, x)
+        if size is None:
+            self._size = (len(texture), len(texture[0]))
+        else:
+            self._size = copy(size)
+            if len(texture) != self._size[0] or len(texture[0]) != self._size[1]:  # type: ignore
+                raise ValueError("Texture dimensions do not match the specified size.")
 
     def __iter__(self):
         return iter(self.texture)
@@ -23,6 +32,6 @@ class TerminalTexture:
 
 
 if __name__ == "__main__":
-    tex = TerminalTexture(["aaaa", "bbbb", "cccc"], [4, 3])
+    tex = Texture(["aaaa", "bbbb", "cccc"], (3, 4))
 
     print(tex.size)

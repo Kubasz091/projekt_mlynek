@@ -1,21 +1,20 @@
 import curses
 import time
 
-from data_loaders.terminal_texture import TerminalTexture
+from data_loaders.terminal_texture import Texture
 from game_objects.cursor import Cursor
 from game_objects.display import Display
-from game_objects.position import Position
 
 
 def main(stdscr):
     curses.curs_set(0)
     stdscr.nodelay(1)
 
-    display = Display(size=(40, 20))
+    display = Display((40, 20))
 
-    cursor = Cursor(
-        position=Position((5, 10)), texture=TerminalTexture(["a██a"], [4, 1]), display_size=(40, 20)
-    )
+    cursor_texture = Texture(["a██a"])
+
+    cursor = Cursor((5, 10), cursor_texture, (40, 20), 0)
 
     cursor_color = 4
 
@@ -48,22 +47,22 @@ def main(stdscr):
             stdscr.refresh()
             try:
                 key = stdscr.getch()
-            except:
+            except Exception:
                 key = -1
 
             if key == ord("q"):
                 running = False
             elif key == curses.KEY_UP and cursor.position[0] > 0:
-                cursor.move(Position((cursor.position[0] - 1, cursor.position[1])))
+                cursor.move((cursor.position[0] - 1, cursor.position[1]))
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == curses.KEY_DOWN and cursor.position[0] < height - 2:
-                cursor.move(Position((cursor.position[0] + 1, cursor.position[1])))
+                cursor.move((cursor.position[0] + 1, cursor.position[1]))
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == curses.KEY_LEFT and cursor.position[1] > 0:
-                cursor.move(Position((cursor.position[0], cursor.position[1] - 1)))
+                cursor.move((cursor.position[0], cursor.position[1] - 1))
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == curses.KEY_RIGHT and cursor.position[1] < width - 2:
-                cursor.move(Position((cursor.position[0], cursor.position[1] + 1)))
+                cursor.move((cursor.position[0], cursor.position[1] + 1))
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == ord("c"):
                 cursor_color = (cursor_color % 4) + 1

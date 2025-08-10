@@ -1,4 +1,5 @@
 import curses
+from typing import Callable
 
 
 class Display:
@@ -65,12 +66,16 @@ class Display:
         wrapper.attroff(curses.color_pair(5))
 
     def draw_char(self, wrapper, y, x, char, color=1, bold=False):
-        self.draw_element(wrapper, lambda: ((x, y), [char]), color, bold)
+        self.draw_element(wrapper, lambda: ((x, y), [char], (1, 1)), color, bold)
 
-    def draw_element(self, wrapper, bound_render_func, color=1, bold=False):
-        (y, x), texture = bound_render_func()
-        texture_height = len(texture)
-        texture_width = len(texture[0]) if texture_height > 0 else 0
+    def draw_element(
+        self,
+        wrapper,
+        bound_render_func: Callable[[], tuple[tuple[int, int], list[str], tuple[int, int]]],
+        color=1,
+        bold=False,
+    ):
+        (y, x), texture, (texture_height, texture_width) = bound_render_func()
 
         y_end, x_end = self.get_drawable_bounds(wrapper, y, x, texture_width, texture_height)
 

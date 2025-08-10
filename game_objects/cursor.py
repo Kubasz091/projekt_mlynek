@@ -1,21 +1,14 @@
-from data_loaders.terminal_texture import TerminalTexture
+from data_loaders.terminal_texture import Texture
 from game_objects.game_object import GameObject
-from game_objects.position import Position
 
 
 class Cursor(GameObject):
-    def __init__(self, position: Position, texture: TerminalTexture, display_size: tuple[int, int]):
-        super().__init__()
+    def __init__(self, position: tuple[int, int], texture: Texture, bounds: tuple[int, int], id: int):
+        super().__init__(id)
         self.position = position
         self.texture = texture
-        self.display_size = display_size
+        self.bounds = bounds
 
-    def move(self, new_position: Position):
-        if (
-            0 <= new_position.pos[0] < self.display_size[0]
-            and 0 <= new_position.pos[1] < self.display_size[1]
-        ):
-            self.position = new_position
-
-    def render(self):
-        return self.position.pos, self.texture.texture
+    def move(self, new_pos: tuple[int, int]):
+        if 0 <= new_pos[0] < self.bounds[0] and 0 <= new_pos[1] < self.bounds[1]:
+            self.position = new_pos

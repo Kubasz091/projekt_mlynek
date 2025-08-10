@@ -1,25 +1,59 @@
-from data_loaders.terminal_texture import TerminalTexture
-from game_objects.game_object import GameObject
-from game_objects.position import Position
-from utils.validators import FixedLengthContainer, Typed, TypedList
+from game_objects.game_object import Connectable, GameObject
+from utils.class_registry import register_game_object
 
 
-class Length8ConnectionList(FixedLengthContainer, TypedList):
-    expected_length = 8
-    expected_type = (GameObject, type(None))
+@register_game_object
+class Field(GameObject, Connectable):
+    pass
 
 
-class PawnConnection(Typed):
-    expected_type = (GameObject, type(None))
+@register_game_object
+class Edge:
+    pass
 
 
-class Field(GameObject):
-    connections = Length8ConnectionList()
-    pawn = PawnConnection()
+@register_game_object
+class Pawn:
+    pass
 
-    def __init__(self, position: Position, texture: TerminalTexture):
-        super().__init__()
-        self.position = position
-        self.texture = texture
-        self.connections = [None] * 8
-        self.pawn = None
+
+if __name__ == "__main__":
+    example_field_data = {
+        "id": 1,
+        "position": [5, 7],
+        "texture": {"graphics": ["..", ".."], "size": [2, 2]},
+        "connections": {
+            "Edge": {"length": 4, "positions": [[0, 0], [1, 0], [0, 1], [1, 1]]},
+            "Pawn": {"length": 1, "positions": [[0, 0]]},
+        },
+    }
+
+    test_field = Field()
+
+    print(Field.__mro__)  # turned out as i wanted
+
+    test_field.load(example_field_data)
+
+    print(test_field.to_json())
+    print(test_field.render())
+    print()
+
+    print("---before connecting---")
+    for connect_list in test_field.connections.values():
+        for i, item in enumerate(connect_list):
+            print(f"{i}. item id: {id(item)}   ", end="")
+        print()
+
+    test_field.connect(Pawn(), (0, 0))
+    test_field.connect(Edge(), (1, 0))
+    test_field.connect(Edge(), (0, 0))
+
+    print("---after connecting---")
+
+    for connect_list in test_field.connections.values():
+        for i, item in enumerate(connect_list):
+            print(f"{i}. item id: {id(item)}    ", end="")
+        print()
+
+    print("---jsonifyiung=---")
+    print(test_field.to_json())
