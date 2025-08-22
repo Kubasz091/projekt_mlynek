@@ -1,36 +1,54 @@
 import json
 from typing import Any
 
-from data_loaders.terminal_texture import Texture
-from utils.class_registry import register_game_object, resolve_game_object
+if __name__ == "__main__":
+    import sys
+    from os.path import abspath, dirname
+
+    sys.path.append(dirname(dirname(abspath(__file__))))
+
+from data_loaders.texture_registry import TextureRegistry
+from utils.class_registry import register_game_object_class, resolve_game_object_class
 from utils.connection_list import ConnectorList
-from utils.position import Position
+from utils.game_object_registry import register_game_object
+from utils.position import Position2D
 from utils.validators import PositiveInt
 
 #
 
 
-@register_game_object
+@register_game_object_class
 class GameObject:
-    position: tuple[int, int] = Position()  # type: ignore
+    position = Position2D()  # type: ignore
     id: int = PositiveInt()  # type: ignore
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # TODO add hints what to add in kwargs
         self.position = (0, 0)
         self.id = 0
-        self.texture = Texture(["no texture"])
+        self.texture = TextureRegistry.instance()["no texture"]
 
         super().__init__()
 
         if kwargs:
             self.load(kwargs)
 
+        register_game_object(self)
+
     def load(self, data: dict[str, Any]):
-        self.position = tuple(data.get("position", [0, 0]))
+        self.position = data.get("position", (0, 0))
         self.id = data.get("id", 0)
 
-        tex = data.get("texture", {})
-        self.texture = Texture(tex.get("graphics", ["no texture"]), tex.get("size", None))
+        tex = data.get("texture", None)
+
+        if tex:
+            _tex_name = tex.get("name", None)
+            _tex_size = tex.get("size", None)
+
+            if _tex_name:
+                self.texture = TextureRegistry.instance()[_tex_name]
+
+            if _tex_size and self.texture.size != tuple(_tex_size):
+                raise ValueError("error with loaded texture size")
 
         try:
             super().load(data)
@@ -38,7 +56,7 @@ class GameObject:
             pass
 
     def render(self):
-        return self.position, self.texture.texture, self.texture.size
+        return self.position, list(self.texture), self.texture.size
 
     #
     ### Json serialization methods ###
@@ -57,14 +75,18 @@ class GameObject:
                 "id": self.id,
                 "position": list(self.position),
                 "texture": {
-                    "graphics": getattr(self.texture, "texture", None),
-                    "size": getattr(self.texture, "size", None),
+                    "name": getattr(self.texture, "name", None),
+                    "size": list(getattr(self.texture, "size", None)),
                 },
             }
         )
         ### GAME OBJECT SERIALIZATION ###
 
         return base
+
+    @classmethod
+    def from_dict(_, data):
+        return resolve_game_object_class(data["__type__"])(**data)
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
@@ -81,7 +103,7 @@ class GameObject:
 #
 
 
-@register_game_object
+@register_game_object_class
 class Connectable:
     def __init__(self, **kwargs) -> None:
         self.connections = {}
@@ -91,11 +113,15 @@ class Connectable:
         if kwargs:
             self.load(kwargs)
 
+        register_game_object(self)
+
     def load(self, data: dict[str, Any]):
-        self.connections = {
-            name: ConnectorList(resolve_game_object(name), info.get("positions", []))
-            for name, info in data.get("connections", {}).items()
-        }
+        self.connections.update(
+            {
+                name: ConnectorList.from_dict(info)
+                for name, info in data.get("connections", {}).items()
+            }
+        )
 
         try:
             super().load(data)
@@ -120,12 +146,16 @@ class Connectable:
 
         ### CONNECTION SERIALIZATION ###
         connections_data = {}
-        for name, positions in self.connections.items():
-            connections_data[name] = [list(connector.pos) for connector in positions._list]
+        for name, connector_list in self.connections.items():
+            connections_data[name] = connector_list.to_dict()
         ### CONNECTION SERIALIZATION ###
 
         base.update({"connections": connections_data})
         return base
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
@@ -139,16 +169,18 @@ class Connectable:
 
 if __name__ == "__main__":
     data = {
-        "position": [1, 2],
-        "texture": {"graphics": ["aaa", "bbb"], "size": [2, 3]},
-        "id": 2,
+        "__type__": "GameObject",
+        "id": 1,
+        "position": [12, 3],
+        "texture": {
+            "name": "pawn_player0",
+            "size": [3, 6],
+        },
     }
 
-    obj = GameObject(**data)
+    obj = GameObject.from_dict(data)
 
-    obj2 = GameObject()
-
-    obj2.load(data)
+    obj2 = GameObject.from_json(json.dumps(data))
 
     print(obj.render())
     print(obj.to_json())

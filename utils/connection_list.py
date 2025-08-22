@@ -1,28 +1,72 @@
 from collections.abc import Sequence
 
-from utils.position import Position
+if __name__ == "__main__":
+    import sys
+    from os.path import abspath, dirname
+
+    sys.path.append(dirname(dirname(abspath(__file__))))
+
+from utils.class_registry import resolve_game_object_class
+from utils.game_object_registry import resolve_game_object
+from utils.position import Position2D
 from utils.unchangable_attribute import CannotChange
 
+#
+#
 
-#
-#
+
 class Connector:
-    pos = Position()
+    pos = Position2D()
 
-    def __init__(self, pos=(0, 0)) -> None:
-        self.pos = tuple(pos)
+    def __init__(self, **kwargs) -> None:
+        self.pos = (0, 0)
         self.obj = None
+
+        if kwargs:
+            self.pos = kwargs.get("position", (0, 0))
+            obj_dict = kwargs.get("obj", None)
+
+            if obj_dict:
+                try:
+                    self.obj = resolve_game_object(
+                        obj_dict.get("class_name", None), obj_dict.get("id", None)
+                    )
+                except Exception as e:
+                    print(f"failed to locate object assigned to the connector with exception: {e}")
+
+    #
+    # JSON
+    #
+
+    def to_dict(self):
+        temp = {"position": self.pos.to_dict(), "obj": None}
+        if self.obj:
+            temp["obj"] = {"id": self.obj.id, "class_name": self.obj.__class__.__name__}
+        return temp
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
+
+
+#
 
 
 class ConnectorList(Sequence):
     _cls = CannotChange()
     _list = CannotChange()
 
-    def __init__(self, cls: type, positions: list[list[int]]) -> None:
+    def __init__(
+        self, cls: type, data: list[dict[str, list[int] | dict[str, int | str]]] | None = None
+    ) -> None:
         super().__init__()
 
         self._cls = cls
-        self._list = [Connector(pos) for pos in positions]
+        self._list = [Connector.from_dict(item) for item in data]
+
+    #
+    # SEQUENCE INTERFACE
+    #
 
     def __setitem__(self, key, value):
         if value is None:
@@ -36,13 +80,14 @@ class ConnectorList(Sequence):
         return self._list[key].obj
 
     def __len__(self):
-        return self._get_len()
+        return sum(connector.obj is not None for connector in self._list)
 
     def __iter__(self):
         return iter(connector.obj for connector in self._list if connector.obj is not None)
 
-    def _get_len(self):
-        return sum(connector.obj is not None for connector in self._list)
+    #
+    #
+    #
 
     def append(self, obj):
         if obj.__class__ is not self._cls:
@@ -70,6 +115,19 @@ class ConnectorList(Sequence):
 
         raise ValueError(f"No connections available at position {pos}")
 
+    #
+    # JSON
+    #
+    def to_dict(self) -> dict[str, list[list[int]]]:
+        return {
+            "class_name": self._cls.__name__,
+            "connector_data": [connector.to_dict() for connector in self._list],
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(resolve_game_object_class(data["class_name"]), data["connector_data"])
+
 
 #
 #
@@ -78,19 +136,22 @@ class ConnectorList(Sequence):
 #
 
 if __name__ == "__main__":
-    from class_registry import register_game_object, resolve_game_object
+    from class_registry import register_game_object_class, resolve_game_object_class
+    from game_object_registry import register_game_object, resolve_game_object
 
-    _ = register_game_object(int)
+    _ = register_game_object_class(int)
 
-    class TestField:
-        def __init__(self):
-            self.connections = None
+    class TestConnectable:
+        def __init__(self, **kwargs):
+            self.connections = {}
+
+            if kwargs:
+                self.load(kwargs)
 
         def load(self, data):
-            self.connections = {
-                name: ConnectorList(resolve_game_object(name), info["positions"])
-                for name, info in data["connections"].items()
-            }
+            self.connections.update(
+                {name: ConnectorList.from_dict(info) for name, info in data.items()}
+            )
 
         def connect(self, obj, pos):
             try:
@@ -98,9 +159,32 @@ if __name__ == "__main__":
             except Exception as e:
                 raise ValueError(f"Failed to connect {obj} at {pos}: {e}") from e
 
-    data = {"connections": {"int": [[0, 0], [1, 1], [1, 2]] }}
+    data = {
+        "int": {
+            "class_name": "int",
+            "connector_data": [
+                {"position": [0, 0], "obj": {"id": 1, "class_name": "int"}},
+                {"position": [0, 1], "obj": {"id": 2, "class_name": "int"}},
+                {"position": [0, 2], "obj": None},
+            ],
+        },
+    }
 
-    test = TestField()
-    test.load(data)
     x = 3
-    test.connect(3, (1, 2))
+
+    y = 4
+
+    register_game_object(x)
+    register_game_object(y)
+
+    test = TestConnectable(**data)
+
+    z = 5
+    test.connect(z, (0, 2))
+
+    w = 6
+
+    try:
+        test.connect(w, (1, 0))
+    except Exception as e:
+        print(e)

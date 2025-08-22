@@ -1,6 +1,7 @@
 from game_objects.game_object import GameObject
+from utils.class_registry import register_game_object_class
 
 
+@register_game_object_class
 class Pawn(GameObject):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    pass

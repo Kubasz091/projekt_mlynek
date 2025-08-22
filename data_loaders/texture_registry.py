@@ -1,32 +1,44 @@
 import json
+from collections.abc import Sequence
 
 from typing_extensions import Self
 
+if __name__ == "__main__":
+    import sys
+    from os.path import abspath, dirname
+
+    sys.path.append(dirname(dirname(abspath(__file__))))
+
 from data_loaders.terminal_texture import Texture
 
+_TERMINAL_GRAPHICS_PATH = "graphic_data/graphics.json"
 
-class TextureRegistry:
+
+class TextureRegistry(Sequence):
     _instance = None
     _initialized = False
 
-    def __new__(cls) -> Self:
+    def __new__(cls, _) -> Self:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self) -> None:
+    def __init__(self, path: str) -> None:
         self._textures: dict[str, Texture] = {}
-        self._loaded = False
+
+        self._load(path)
+
         TextureRegistry._initialized = True
 
-    def load(self, path: str) -> None:
+    def _load(self, path: str) -> None:
         try:
             with open(path) as file:
                 texture_data = json.load(file)
 
             for name, data in texture_data.items():
-                self._textures[name] = Texture(data["graphics"], tuple(data["size"]))
-            self._loaded = True
+                self._textures[name] = Texture(name, data["graphics"], tuple(data["size"]))
+
+            self._textures["no texture"] = Texture("no texture", ["no texture"])
 
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Texture file not found: {path}") from e
@@ -36,8 +48,8 @@ class TextureRegistry:
             raise RuntimeError(f"Unexpected error loading texture file: {path}: {e}") from e
 
     def __getitem__(self, texture_name: str) -> Texture:
-        if not self._loaded:
-            raise RuntimeError("Textures not loaded. Call load_from_file() first.")
+        if not TextureRegistry._initialized:
+            raise RuntimeError("Textures not loaded. Initialize the registry")
 
         if texture_name not in self._textures:
             raise KeyError(
@@ -49,12 +61,30 @@ class TextureRegistry:
     def __contains__(self, texture_name: str) -> bool:
         return texture_name in self._textures
 
+    def __len__(self) -> int:
+        return len(self._textures)
+
     def list_textures(self) -> list[str]:
         return list(self._textures.keys())
 
+    @classmethod
+    def register(cls, texture: Texture) -> None:
+        if texture.name in cls.instance()._textures:
+            raise ValueError(f"Texture '{texture.name}' already exists in the registry.")
+        cls.instance()._textures[texture.name] = texture
+
+    @classmethod
+    def instance(cls):
+        if cls._instance is None:
+            raise RuntimeError("Textures not loaded. Initialize the registry")
+        return cls._instance
+
+
+_ = TextureRegistry(_TERMINAL_GRAPHICS_PATH)
 
 if __name__ == "__main__":
-    registry = TextureRegistry()
-    registry.load("graphic_data/graphics.json")
+    registry2 = TextureRegistry.instance()
+    print("Available textures:", registry2.list_textures())
 
-    print("Available textures:", registry.list_textures())
+    dot1 = registry2["dot"]
+    print(list(dot1))

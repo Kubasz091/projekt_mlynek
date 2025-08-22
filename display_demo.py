@@ -2,6 +2,7 @@ import curses
 import time
 
 from data_loaders.terminal_texture import Texture
+from data_loaders.texture_registry import TextureRegistry
 from game_objects.cursor import Cursor
 from game_objects.display import Display
 
@@ -12,9 +13,11 @@ def main(stdscr):
 
     display = Display((40, 20))
 
-    cursor_texture = Texture(["a██a"])
+    cursor_texture = Texture("cursor", ["a██a"])
 
-    cursor = Cursor((5, 10), cursor_texture, (40, 20), 0)
+    TextureRegistry.register(cursor_texture)
+
+    cursor = Cursor((40, 20), texture={"name": "cursor"}, id=1, position=(20, 10))
 
     cursor_color = 4
 
@@ -53,16 +56,16 @@ def main(stdscr):
             if key == ord("q"):
                 running = False
             elif key == curses.KEY_UP and cursor.position[0] > 0:
-                cursor.move((cursor.position[0] - 1, cursor.position[1]))
+                cursor.move_up()
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == curses.KEY_DOWN and cursor.position[0] < height - 2:
-                cursor.move((cursor.position[0] + 1, cursor.position[1]))
+                cursor.move_down()
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == curses.KEY_LEFT and cursor.position[1] > 0:
-                cursor.move((cursor.position[0], cursor.position[1] - 1))
+                cursor.move_left()
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == curses.KEY_RIGHT and cursor.position[1] < width - 2:
-                cursor.move((cursor.position[0], cursor.position[1] + 1))
+                cursor.move_right()
                 status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
             elif key == ord("c"):
                 cursor_color = (cursor_color % 4) + 1

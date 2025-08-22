@@ -1,14 +1,24 @@
-from data_loaders.terminal_texture import Texture
 from game_objects.game_object import GameObject
 
 
 class Cursor(GameObject):
-    def __init__(self, position: tuple[int, int], texture: Texture, bounds: tuple[int, int], id: int):
-        super().__init__(id)
-        self.position = position
-        self.texture = texture
+    def __init__(self, bounds: tuple[int, int], **kwargs):
+        super().__init__(**kwargs)
+
         self.bounds = bounds
 
-    def move(self, new_pos: tuple[int, int]):
-        if 0 <= new_pos[0] < self.bounds[0] and 0 <= new_pos[1] < self.bounds[1]:
-            self.position = new_pos
+    def move_up(self):
+        if self.position[0] > 0:
+            self.position[0] -= 1
+
+    def move_down(self):
+        if self.position[0] < self.bounds[0] - 1:
+            self.position[0] += 1
+
+    def move_left(self):
+        if self.position[1] > 0:
+            self.position[1] -= 1
+
+    def move_right(self):
+        if self.position[1] < self.bounds[1] - 1:
+            self.position[1] += 1

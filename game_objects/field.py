@@ -1,30 +1,44 @@
+if __name__ == "__main__":
+    import sys
+    from os.path import abspath, dirname
+
+    sys.path.append(dirname(dirname(abspath(__file__))))
+
 from game_objects.game_object import Connectable, GameObject
-from utils.class_registry import register_game_object
+from utils.class_registry import class_registry_dict, register_game_object_class
 
 
-@register_game_object
+@register_game_object_class
 class Field(GameObject, Connectable):
     pass
 
 
-@register_game_object
-class Edge:
-    pass
-
-
-@register_game_object
-class Pawn:
-    pass
-
 
 if __name__ == "__main__":
+    print(class_registry_dict())
     example_field_data = {
         "id": 1,
         "position": [5, 7],
-        "texture": {"graphics": ["..", ".."], "size": [2, 2]},
+        "texture": {
+            "name": "pawn_player0",
+            "size": [3, 6],
+        },
         "connections": {
-            "Edge": {"length": 4, "positions": [[0, 0], [1, 0], [0, 1], [1, 1]]},
-            "Pawn": {"length": 1, "positions": [[0, 0]]},
+            "Edge": {
+                "class_name": "Edge",
+                "connector_data": [
+                    {"position": [0, 0], "obj": None},
+                    {"position": [1, 0], "obj": None},
+                    {"position": [0, 1], "obj": None},
+                    {"position": [1, 1], "obj": None},
+                ],
+            },
+            "Pawn": {
+                "class_name": "Pawn",
+                "connector_data": [
+                    {"position": [0, 0], "obj": None},
+                ],
+            },
         },
     }
 
@@ -34,7 +48,6 @@ if __name__ == "__main__":
 
     test_field.load(example_field_data)
 
-    print(test_field.to_json())
     print(test_field.render())
     print()
 
