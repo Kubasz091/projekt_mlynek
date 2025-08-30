@@ -4,8 +4,8 @@ if __name__ == "__main__":
 
     sys.path.append(dirname(dirname(abspath(__file__))))
 
+from data_loaders.class_registry import class_registry_dict, register_game_object_class
 from game_objects.game_object import Connectable, GameObject
-from utils.class_registry import class_registry_dict, register_game_object_class
 
 
 @register_game_object_class

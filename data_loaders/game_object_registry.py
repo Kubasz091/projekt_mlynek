@@ -55,10 +55,29 @@ def resolve_game_object(class_name: str, id: int):
         raise ValueError(f"Unknown GameObject: {class_name} with id: {id}") from e
 
 
-def game_object_registry_dict():
+def game_object_registry_ids_dict():
     tmp = {}
     for class_name, inner_dict in _GAME_OBJECT_REGISTRY.items():
         tmp[class_name] = []
         for id, _ in inner_dict.items():
             tmp[class_name].append(id)
     return {"GAME_OBJECT_REGISTRY": tmp}
+
+
+def game_objects_to_dict():
+    tmp = {}
+    for class_name, inner_dict in _GAME_OBJECT_REGISTRY.items():
+        tmp[class_name] = {}
+        for id, obj in inner_dict.items():
+            try:
+                tmp[class_name][id] = obj.to_dict()
+            except Exception as e:
+                raise RuntimeError(
+                    f"Failed to serialize {obj} of class {class_name} with id {id}: {e}"
+                ) from e
+    return tmp
+
+
+def all_game_objects_generator():
+    for inner_dict in _GAME_OBJECT_REGISTRY.values():
+        yield from inner_dict.values()

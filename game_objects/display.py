@@ -1,122 +1,212 @@
 import curses
+import threading
+import time
+from abc import ABC, abstractmethod
 from typing import Callable
 
+from game_objects.cursor import Cursor
 
-class Display:
-    def __init__(self, size=(20, 10)):
+
+class Display(ABC):
+    def __init__(self, size=(20, 10), goal_Hz=50.0):
         self.size = size
-        self._init_colors()
+        self.output = None
+        self._goal_refresh_time = 1 / goal_Hz
 
-    def _init_colors(self):
-        curses.start_color()
-        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    @abstractmethod
+    def render_frame(self, gen_objs_to_render=None):
+        pass
 
-    def get_drawable_bounds(self, wrapper, y, x, texture_width, texture_height):
+
+class CursesDisplay(Display):  # renders only terminal textures
+    def __init__(self, size=(20, 10), goal_Hz=50.0):
+        super().__init__(size, goal_Hz)
+
+        self._current_key_pressed = -1
+        self._current_size_y = 0
+        self._current_size_x = 0
+
+        self.statusbar_text = "Press 'q' to exit | 'e' to move pawns | '←↑→↓' to Move"
+
+        self.cursor1 = Cursor(size, texture={"name": "cursor"}, id=1, position={"y": 1, "x": 1})
+        self.cursor2 = Cursor(size, texture={"name": "cursor"}, id=2, position={"y": 10, "x": 1})
+
+        self.running = True
+        self.state_lock = threading.RLock()
+        self.ui_ready = threading.Event()
+
+    def run(self, stdscr=None, gen_objs_acces_func=None):
+        if not stdscr and not self.output:
+            curses.wrapper(self.run, gen_objs_acces_func)
+            return
+        elif stdscr and not self.output:
+            self.output = stdscr
+            self._init_curses()
+            self.ui_ready.set()
+
+        self._continous_render_process(gen_objs_acces_func=gen_objs_acces_func)
+
+    def _continous_render_process(self, gen_objs_acces_func=None):
+        next_tick = time.perf_counter()
+
+        while self.running:
+            self._input_procces()
+            self.render_frame(gen_objs_acces_func)
+
+            next_tick += self._goal_refresh_time
+            now = time.perf_counter()
+            sleep_s = next_tick - now
+
+            if sleep_s > 0:
+                time.sleep(sleep_s)
+            else:
+                while next_tick <= now:
+                    next_tick += self._goal_refresh_time
+
+    def _input_procces(self):
+        key = self._get_curr_key()
+
+        if key == ord("q"):
+            self.running = False
+        elif key == curses.KEY_UP:
+            with self.state_lock:
+                self.cursor1.move_up()
+        elif key == curses.KEY_DOWN:
+            with self.state_lock:
+                self.cursor1.move_down()
+        elif key == curses.KEY_LEFT:
+            with self.state_lock:
+                self.cursor1.move_left()
+        elif key == curses.KEY_RIGHT:
+            with self.state_lock:
+                self.cursor1.move_right()
+
+    def render_frame(self, gen_objs_acces_func=None):
+        self.output.clear()
+
+        self._draw_basic_display()
+
+        if gen_objs_acces_func:
+            for obj in gen_objs_acces_func():
+                self.draw_element(obj.render, 6)
+
+        self.draw_element(self.cursor1.render, 1)
+        self.draw_element(self.cursor2.render, 2)
+
+        self.output.refresh()
+
+    def draw_element(
+        self,
+        bound_render_func: Callable[[], tuple[tuple[int, int], tuple[str], tuple[int, int]]],
+        color=1,
+        bold=False,
+    ):
+        with self.state_lock:
+            (y, x), texture, (texture_height, texture_width) = bound_render_func()
+
+        y_end, x_end = self._get_drawable_bounds(y, x, texture_width, texture_height)
+
+        if bold:
+            self.output.attron(curses.A_BOLD)
+        self.output.attron(curses.color_pair(color))
+
+        for n, row in enumerate(texture[:y_end]):
+            visible_row = row[:x_end]
+            if visible_row:
+                self.output.addstr(y + n, x, visible_row)
+
+        self.output.attroff(curses.color_pair(color))
+        if bold:
+            self.output.attroff(curses.A_BOLD)
+
+    def _draw_status_bar(self, text=None):
+        if self._current_size_y < 1:
+            return
+
+        if not text:
+            text = self.statusbar_text
+        remaining = self._current_size_x - len(text) - 1
+        fill_spaces = " " * max(0, remaining)
+
+        self.draw_element(
+            lambda: (
+                (self._current_size_y - 1, 0),
+                (text + fill_spaces,),
+                (1, self._current_size_x),
+            ),
+            5,
+            True,
+        )
+
+    #
+    #
+    #
+
+    def _get_curr_key(self):
+        try:
+            self._current_key_pressed = self.output.getch()
+        except Exception:
+            self._current_key_pressed = -1
+        return self._current_key_pressed
+
+    def _get_drawable_bounds(self, y, x, texture_width, texture_height):
         display_height, display_width = self.size
-        terminal_height, terminal_width = wrapper.getmaxyx()
 
-        effective_height = min(display_height, terminal_height)
-        effective_width = min(display_width, terminal_width)
+        effective_height = min(display_height, self._current_size_y)
+        effective_width = min(display_width, self._current_size_x)
 
         y_end = max(min(texture_height, effective_height - y), 0)
         x_end = max(min(texture_width, effective_width - x), 0)
 
         return y_end, x_end
 
-    def draw_basic_display(self, wrapper):
-        height, width = wrapper.getmaxyx()
+    def _draw_basic_display(self):  # and handle too small terminal size for the display
+        self._current_size_y, self._current_size_x = self.output.getmaxyx()
 
-        if height >= self.size[1] + 1 and width >= self.size[0]:
-            status_bar = "Display Ready"
-            self.draw_status_bar(wrapper, status_bar)
+        if self._current_size_y >= self.size[1] + 1 and self._current_size_x >= self.size[0]:
+            self._draw_status_bar()
             return True
         else:
-            self._display_terminal_too_small_message(wrapper, height, width)
+            self._display_terminal_too_small_message()
             return False
 
-    def draw_colored_text(self, wrapper, y, x, text, color_pair):
-        _, x_end = self.get_drawable_bounds(wrapper, y, x, len(text), 1)
+    def _display_terminal_too_small_message(self):
+        _x_message = abs(min(0, self._current_size_x - self.size[0]))
+        _y_message = abs(min(0, self._current_size_y - (self.size[1] + 1)))
 
-        if x_end <= 0:
-            return
+        _message = (
+            "board can't fit",
+            "expand the terminal",
+            f"by x:{_x_message}, y:{_y_message}",
+            "characters",
+        )
+        _max_len = max(len(msg) for msg in _message)
 
-        visible_text = text[:x_end]
-        wrapper.attron(curses.color_pair(color_pair))
-        wrapper.addstr(y, x, visible_text)
-        wrapper.attroff(curses.color_pair(color_pair))
+        start_x_message = int((self._current_size_x // 2) - (_max_len // 2) - _max_len % 2)
+        start_y_message = int(self._current_size_y // 2)
 
-    def draw_status_bar(self, wrapper, text):
-        height, width = wrapper.getmaxyx()
-        if height < 1:
-            return
-
-        wrapper.attron(curses.color_pair(5))
-        wrapper.attron(curses.A_BOLD)
-        wrapper.addstr(height - 1, 0, text[: width - 1] if len(text) >= width else text)
-
-        remaining = width - len(text) - 1
-        if remaining > 0:
-            wrapper.addstr(height - 1, len(text), " " * remaining)
-
-        wrapper.attroff(curses.A_BOLD)
-        wrapper.attroff(curses.color_pair(5))
-
-    def draw_char(self, wrapper, y, x, char, color=1, bold=False):
-        self.draw_element(wrapper, lambda: ((x, y), [char], (1, 1)), color, bold)
-
-    def draw_element(
-        self,
-        wrapper,
-        bound_render_func: Callable[[], tuple[tuple[int, int], list[str], tuple[int, int]]],
-        color=1,
-        bold=False,
-    ):
-        (y, x), texture, (texture_height, texture_width) = bound_render_func()
-
-        y_end, x_end = self.get_drawable_bounds(wrapper, y, x, texture_width, texture_height)
-
-        if bold:
-            wrapper.attron(curses.A_BOLD)
-        wrapper.attron(curses.color_pair(color))
-
-        for n, row in enumerate(texture[:y_end]):
-            visible_row = row[:x_end]
-            if visible_row:
-                wrapper.addstr(y + n, x, visible_row)
-
-        wrapper.attroff(curses.color_pair(color))
-        if bold:
-            wrapper.attroff(curses.A_BOLD)
-
-    def _display_terminal_too_small_message(self, wrapper, height, width):
-        x_message = width - self.size[0]
-        y_message = height - (self.size[1] + 1)
-        x_message = min(0, x_message)
-        y_message = min(0, y_message)
-        y_message = abs(y_message)
-
-        message_01 = "board can't fit"
-        message_02 = "expand the terminal"
-        message_03 = f"by x:{abs(x_message)}, y:{y_message}"
-        message_04 = "characters"
-
-        start_x_message = int((width // 2) - (len(message_02) // 2) - len(message_02) % 2)
-        start_y_message = int(height // 2)
-
-        wrapper.attron(curses.color_pair(2))
-        wrapper.attron(curses.A_BOLD)
-
-        if height > 4:
-            wrapper.addstr(start_y_message - 2, start_x_message, message_01)
-            wrapper.addstr(start_y_message - 1, start_x_message, message_02)
-            wrapper.addstr(start_y_message, start_x_message, message_03)
-            wrapper.addstr(start_y_message + 1, start_x_message, message_04)
+        if self._current_size_x > 4:
+            self.draw_element(
+                lambda: ((start_y_message, start_x_message), _message, (4, _max_len)), 2, True
+            )
         else:
-            wrapper.addstr(start_y_message, start_x_message, message_01)
+            self.draw_element(
+                lambda: ((start_y_message, start_x_message), (_message[0],), (1, len(_message[0]))),
+                2,
+                True,
+            )
 
-        wrapper.attroff(curses.A_BOLD)
-        wrapper.attroff(curses.color_pair(2))
+    def _init_curses(self):
+        curses.curs_set(0)
+        curses.noecho()
+        curses.cbreak()
+        self.output.keypad(True)
+        self.output.nodelay(True)
+
+        curses.start_color()
+        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLACK)

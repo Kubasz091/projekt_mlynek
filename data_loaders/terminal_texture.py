@@ -58,8 +58,15 @@ class Texture(Sequence):
         return self._name
 
     @name.setter
-    def name(self, value: str):
+    def name(self, value: str) -> None:
         self._name = value
+
+    def to_dict(self):
+        return {"name": self._name, "size": list(self._size)}
+
+    @classmethod
+    def from_dict(_):
+        raise AttributeError("Use texture registry to get textures")
 
 
 #

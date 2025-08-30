@@ -16,9 +16,9 @@ class Cursor(GameObject):
             self.position[0] += 1
 
     def move_left(self):
-        if self.position[1] > 0:
-            self.position[1] -= 1
+        if self.position[1] > 1:
+            self.position[1] -= 2
 
     def move_right(self):
-        if self.position[1] < self.bounds[1] - 1:
-            self.position[1] += 1
+        if self.position[1] < self.bounds[1] - 2:
+            self.position[1] += 2

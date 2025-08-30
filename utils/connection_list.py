@@ -6,8 +6,8 @@ if __name__ == "__main__":
 
     sys.path.append(dirname(dirname(abspath(__file__))))
 
-from utils.class_registry import resolve_game_object_class
-from utils.game_object_registry import resolve_game_object
+from data_loaders.class_registry import resolve_game_object_class
+from data_loaders.game_object_registry import resolve_game_object
 from utils.position import Position2D
 from utils.unchangable_attribute import CannotChange
 
@@ -21,18 +21,16 @@ class Connector:
     def __init__(self, **kwargs) -> None:
         self.pos = (0, 0)
         self.obj = None
+        self.obj_dict = None
 
         if kwargs:
-            self.pos = kwargs.get("position", (0, 0))
-            obj_dict = kwargs.get("obj", None)
+            pos_data = kwargs.get("position", None)
+            if pos_data:
+                self.pos = Position2D.from_dict(pos_data)
 
-            if obj_dict:
-                try:
-                    self.obj = resolve_game_object(
-                        obj_dict.get("class_name", None), obj_dict.get("id", None)
-                    )
-                except Exception as e:
-                    print(f"failed to locate object assigned to the connector with exception: {e}")
+            self.obj_dict = kwargs.get(
+                "obj", None
+            )  # save for later to connect after loading all the objects
 
     #
     # JSON
@@ -43,6 +41,20 @@ class Connector:
         if self.obj:
             temp["obj"] = {"id": self.obj.id, "class_name": self.obj.__class__.__name__}
         return temp
+
+    def connect_from_previous_load(self):
+        if self.obj_dict:
+            try:
+                self.obj = resolve_game_object(
+                    self.obj_dict.get("class_name", None), self.obj_dict.get("id", None)
+                )
+            except Exception as e:
+                print(f"failed to locate object assigned to the connector with exception: {e}")
+
+        try:
+            delattr(self, "obj_dict")
+        except AttributeError:
+            pass
 
     @classmethod
     def from_dict(cls, data):
@@ -115,6 +127,10 @@ class ConnectorList(Sequence):
 
         raise ValueError(f"No connections available at position {pos}")
 
+    def connect_from_previous_load(self):
+        for connector in self._list:
+            connector.connect_from_previous_load()
+
     #
     # JSON
     #
@@ -136,8 +152,8 @@ class ConnectorList(Sequence):
 #
 
 if __name__ == "__main__":
-    from class_registry import register_game_object_class, resolve_game_object_class
-    from game_object_registry import register_game_object, resolve_game_object
+    from data_loaders.class_registry import register_game_object_class, resolve_game_object_class
+    from data_loaders.game_object_registry import register_game_object, resolve_game_object
 
     _ = register_game_object_class(int)
 
@@ -163,9 +179,9 @@ if __name__ == "__main__":
         "int": {
             "class_name": "int",
             "connector_data": [
-                {"position": [0, 0], "obj": {"id": 1, "class_name": "int"}},
-                {"position": [0, 1], "obj": {"id": 2, "class_name": "int"}},
-                {"position": [0, 2], "obj": None},
+                {"position": {"y": 0, "x": 0}, "obj": {"id": 1, "class_name": "int"}},
+                {"position": {"y": 0, "x": 1}, "obj": {"id": 2, "class_name": "int"}},
+                {"position": {"y": 0, "x": 2}, "obj": None},
             ],
         },
     }

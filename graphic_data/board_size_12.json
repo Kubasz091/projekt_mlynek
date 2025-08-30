@@ -1,0 +1,2443 @@
+{
+    "Edge": {
+        "1": {
+            "id": 1,
+            "position": {
+                "y": 1,
+                "x": 6
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "2": {
+            "id": 2,
+            "position": {
+                "y": 1,
+                "x": 12
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "3": {
+            "id": 3,
+            "position": {
+                "y": 1,
+                "x": 18
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "4": {
+            "id": 4,
+            "position": {
+                "y": 1,
+                "x": 24
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "5": {
+            "id": 5,
+            "position": {
+                "y": 1,
+                "x": 30
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "6": {
+            "id": 6,
+            "position": {
+                "y": 1,
+                "x": 42
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "7": {
+            "id": 7,
+            "position": {
+                "y": 1,
+                "x": 48
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "8": {
+            "id": 8,
+            "position": {
+                "y": 1,
+                "x": 54
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "9": {
+            "id": 9,
+            "position": {
+                "y": 1,
+                "x": 60
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "10": {
+            "id": 10,
+            "position": {
+                "y": 1,
+                "x": 66
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "11": {
+            "id": 11,
+            "position": {
+                "y": 7,
+                "x": 18
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "12": {
+            "id": 12,
+            "position": {
+                "y": 7,
+                "x": 24
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "13": {
+            "id": 13,
+            "position": {
+                "y": 7,
+                "x": 30
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "14": {
+            "id": 14,
+            "position": {
+                "y": 7,
+                "x": 42
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "15": {
+            "id": 15,
+            "position": {
+                "y": 7,
+                "x": 48
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "16": {
+            "id": 16,
+            "position": {
+                "y": 7,
+                "x": 54
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "17": {
+            "id": 17,
+            "position": {
+                "y": 13,
+                "x": 30
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "18": {
+            "id": 18,
+            "position": {
+                "y": 13,
+                "x": 42
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "19": {
+            "id": 19,
+            "position": {
+                "y": 19,
+                "x": 6
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "20": {
+            "id": 20,
+            "position": {
+                "y": 19,
+                "x": 18
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "21": {
+            "id": 21,
+            "position": {
+                "y": 19,
+                "x": 54
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "22": {
+            "id": 22,
+            "position": {
+                "y": 19,
+                "x": 66
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "23": {
+            "id": 23,
+            "position": {
+                "y": 25,
+                "x": 30
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "24": {
+            "id": 24,
+            "position": {
+                "y": 25,
+                "x": 42
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "25": {
+            "id": 25,
+            "position": {
+                "y": 31,
+                "x": 18
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "26": {
+            "id": 26,
+            "position": {
+                "y": 31,
+                "x": 24
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "27": {
+            "id": 27,
+            "position": {
+                "y": 31,
+                "x": 30
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "28": {
+            "id": 28,
+            "position": {
+                "y": 31,
+                "x": 42
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "29": {
+            "id": 29,
+            "position": {
+                "y": 31,
+                "x": 48
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "30": {
+            "id": 30,
+            "position": {
+                "y": 31,
+                "x": 54
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "31": {
+            "id": 31,
+            "position": {
+                "y": 37,
+                "x": 6
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "32": {
+            "id": 32,
+            "position": {
+                "y": 37,
+                "x": 12
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "33": {
+            "id": 33,
+            "position": {
+                "y": 37,
+                "x": 18
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "34": {
+            "id": 34,
+            "position": {
+                "y": 37,
+                "x": 24
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "35": {
+            "id": 35,
+            "position": {
+                "y": 37,
+                "x": 30
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "36": {
+            "id": 36,
+            "position": {
+                "y": 37,
+                "x": 42
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "37": {
+            "id": 37,
+            "position": {
+                "y": 37,
+                "x": 48
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "38": {
+            "id": 38,
+            "position": {
+                "y": 37,
+                "x": 54
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "39": {
+            "id": 39,
+            "position": {
+                "y": 37,
+                "x": 60
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "40": {
+            "id": 40,
+            "position": {
+                "y": 37,
+                "x": 66
+            },
+            "texture": {
+                "name": "horizontal_line"
+            }
+        },
+        "41": {
+            "id": 41,
+            "position": {
+                "y": 3,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "42": {
+            "id": 42,
+            "position": {
+                "y": 3,
+                "x": 38
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "43": {
+            "id": 43,
+            "position": {
+                "y": 3,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "44": {
+            "id": 44,
+            "position": {
+                "y": 6,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "45": {
+            "id": 45,
+            "position": {
+                "y": 6,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "46": {
+            "id": 46,
+            "position": {
+                "y": 9,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "47": {
+            "id": 47,
+            "position": {
+                "y": 9,
+                "x": 14
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "48": {
+            "id": 48,
+            "position": {
+                "y": 9,
+                "x": 38
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "49": {
+            "id": 49,
+            "position": {
+                "y": 9,
+                "x": 62
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "50": {
+            "id": 50,
+            "position": {
+                "y": 9,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "51": {
+            "id": 51,
+            "position": {
+                "y": 12,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "52": {
+            "id": 52,
+            "position": {
+                "y": 12,
+                "x": 14
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "53": {
+            "id": 53,
+            "position": {
+                "y": 12,
+                "x": 62
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "54": {
+            "id": 54,
+            "position": {
+                "y": 12,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "55": {
+            "id": 55,
+            "position": {
+                "y": 15,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "56": {
+            "id": 56,
+            "position": {
+                "y": 15,
+                "x": 14
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "57": {
+            "id": 57,
+            "position": {
+                "y": 15,
+                "x": 26
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "58": {
+            "id": 58,
+            "position": {
+                "y": 15,
+                "x": 50
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "59": {
+            "id": 59,
+            "position": {
+                "y": 15,
+                "x": 62
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "60": {
+            "id": 60,
+            "position": {
+                "y": 15,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "61": {
+            "id": 61,
+            "position": {
+                "y": 21,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "62": {
+            "id": 62,
+            "position": {
+                "y": 21,
+                "x": 14
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "63": {
+            "id": 63,
+            "position": {
+                "y": 21,
+                "x": 26
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "64": {
+            "id": 64,
+            "position": {
+                "y": 21,
+                "x": 50
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "65": {
+            "id": 65,
+            "position": {
+                "y": 21,
+                "x": 62
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "66": {
+            "id": 66,
+            "position": {
+                "y": 21,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "67": {
+            "id": 67,
+            "position": {
+                "y": 24,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "68": {
+            "id": 68,
+            "position": {
+                "y": 24,
+                "x": 14
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "69": {
+            "id": 69,
+            "position": {
+                "y": 24,
+                "x": 62
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "70": {
+            "id": 70,
+            "position": {
+                "y": 24,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "71": {
+            "id": 71,
+            "position": {
+                "y": 27,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "72": {
+            "id": 72,
+            "position": {
+                "y": 27,
+                "x": 14
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "73": {
+            "id": 73,
+            "position": {
+                "y": 27,
+                "x": 38
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "74": {
+            "id": 74,
+            "position": {
+                "y": 27,
+                "x": 62
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "75": {
+            "id": 75,
+            "position": {
+                "y": 27,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "76": {
+            "id": 76,
+            "position": {
+                "y": 30,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "77": {
+            "id": 77,
+            "position": {
+                "y": 30,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "78": {
+            "id": 78,
+            "position": {
+                "y": 33,
+                "x": 2
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "79": {
+            "id": 79,
+            "position": {
+                "y": 33,
+                "x": 38
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "80": {
+            "id": 80,
+            "position": {
+                "y": 33,
+                "x": 74
+            },
+            "texture": {
+                "name": "vertical_line"
+            }
+        },
+        "81": {
+            "id": 81,
+            "position": {
+                "y": 2,
+                "x": 5
+            },
+            "texture": {
+                "name": "diagonal_u_d"
+            }
+        },
+        "82": {
+            "id": 82,
+            "position": {
+                "y": 8,
+                "x": 17
+            },
+            "texture": {
+                "name": "diagonal_u_d"
+            }
+        },
+        "83": {
+            "id": 83,
+            "position": {
+                "y": 2,
+                "x": 65
+            },
+            "texture": {
+                "name": "diagonal_u_d"
+            }
+        },
+        "84": {
+            "id": 84,
+            "position": {
+                "y": 8,
+                "x": 53
+            },
+            "texture": {
+                "name": "diagonal_u_d"
+            }
+        },
+        "85": {
+            "id": 85,
+            "position": {
+                "y": 26,
+                "x": 53
+            },
+            "texture": {
+                "name": "diagonal_d_u"
+            }
+        },
+        "86": {
+            "id": 86,
+            "position": {
+                "y": 32,
+                "x": 65
+            },
+            "texture": {
+                "name": "diagonal_d_u"
+            }
+        },
+        "87": {
+            "id": 87,
+            "position": {
+                "y": 26,
+                "x": 17
+            },
+            "texture": {
+                "name": "diagonal_d_u"
+            }
+        },
+        "88": {
+            "id": 88,
+            "position": {
+                "y": 32,
+                "x": 5
+            },
+            "texture": {
+                "name": "diagonal_d_u"
+            }
+        }
+    },
+    "Field": {
+        "0": {
+            "id": 0,
+            "position": {
+                "y": 0,
+                "x": 0
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 46,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "1": {
+            "id": 1,
+            "position": {
+                "y": 0,
+                "x": 36
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 3,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 42,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "2": {
+            "id": 2,
+            "position": {
+                "y": 0,
+                "x": 72
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 8,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 50,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "3": {
+            "id": 3,
+            "position": {
+                "y": 6,
+                "x": 12
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 88,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 52,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "4": {
+            "id": 4,
+            "position": {
+                "y": 6,
+                "x": 36
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 12,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 42,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 48,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "5": {
+            "id": 5,
+            "position": {
+                "y": 6,
+                "x": 60
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 84,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 86,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 53,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "6": {
+            "id": 6,
+            "position": {
+                "y": 12,
+                "x": 24
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 82,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 57,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "7": {
+            "id": 7,
+            "position": {
+                "y": 12,
+                "x": 36
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 17,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 48,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 18,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "8": {
+            "id": 8,
+            "position": {
+                "y": 12,
+                "x": 48
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 18,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 84,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 58,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "9": {
+            "id": 9,
+            "position": {
+                "y": 18,
+                "x": 0
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 46,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 71,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "10": {
+            "id": 10,
+            "position": {
+                "y": 18,
+                "x": 12
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 19,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 52,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 68,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "11": {
+            "id": 11,
+            "position": {
+                "y": 18,
+                "x": 24
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 20,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 57,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 63,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "12": {
+            "id": 12,
+            "position": {
+                "y": 18,
+                "x": 48
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 58,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 64,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "13": {
+            "id": 13,
+            "position": {
+                "y": 18,
+                "x": 60
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 21,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 53,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 69,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "14": {
+            "id": 14,
+            "position": {
+                "y": 18,
+                "x": 72
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 22,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 50,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 75,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "15": {
+            "id": 15,
+            "position": {
+                "y": 24,
+                "x": 24
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 82,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 63,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 23,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "16": {
+            "id": 16,
+            "position": {
+                "y": 24,
+                "x": 36
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 23,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 73,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "17": {
+            "id": 17,
+            "position": {
+                "y": 24,
+                "x": 48
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 24,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 64,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 84,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "18": {
+            "id": 18,
+            "position": {
+                "y": 30,
+                "x": 12
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 81,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 82,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 26,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "19": {
+            "id": 19,
+            "position": {
+                "y": 30,
+                "x": 36
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 26,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 73,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 79,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "20": {
+            "id": 20,
+            "position": {
+                "y": 30,
+                "x": 60
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 84,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 29,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 69,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 83,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "21": {
+            "id": 21,
+            "position": {
+                "y": 36,
+                "x": 0
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 71,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 33,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "22": {
+            "id": 22,
+            "position": {
+                "y": 36,
+                "x": 36
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 33,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 79,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 38,
+                                "class_name": "Edge"
+                            }
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        },
+        "23": {
+            "id": 23,
+            "position": {
+                "y": 36,
+                "x": 72
+            },
+            "texture": {
+                "name": "dot"
+            },
+            "connections": {
+                "Edge": {
+                    "class_name": "Edge",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 83,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 0
+                            },
+                            "obj": {
+                                "id": 38,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 1
+                            },
+                            "obj": {
+                                "id": 75,
+                                "class_name": "Edge"
+                            }
+                        },
+                        {
+                            "position": {
+                                "y": 1,
+                                "x": 1
+                            },
+                            "obj": null
+                        }
+                    ]
+                },
+                "Pawn": {
+                    "class_name": "Pawn",
+                    "connector_data": [
+                        {
+                            "position": {
+                                "y": 0,
+                                "x": 0
+                            },
+                            "obj": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

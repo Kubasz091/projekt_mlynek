@@ -54,7 +54,10 @@ class Position2D(Sequence):
         self.name = name
 
     def __set__(self, instance, value: tuple[int, int]):
-        instance.__dict__[self.name] = Position2D(value)
+        if type(value) is Position2D:
+            instance.__dict__[self.name] = value
+        else:
+            instance.__dict__[self.name] = Position2D(value)
 
     #
 
@@ -76,33 +79,47 @@ class Position2D(Sequence):
 
 
 if __name__ == "__main__":
-    pos = Position2D([0, 1])
-    _iter = iter(pos)
-
-    print(_iter.__next__())
-    print(_iter.__next__())
+    print("=== Position2D Basic Iteration ===")
+    pos = Position2D((0, 1))
+    print("Initial pos:", pos)
+    print("Iterating over pos:")
+    for idx, val in enumerate(pos):
+        print(f"  pos[{idx}] -> {val}")
 
     pos[0] += 1
+    print("\nAfter pos[0] += 1 ->", pos)
     print()
 
-    _iter = iter(pos)
-
-    print(_iter.__next__())
-    print(_iter.__next__())
+    print("=== Descriptor Behavior in TestClass ===")
 
     class TestClass:
         position = Position2D()
 
         def __init__(self, pos: tuple[int, int]):
             self.position = pos
-            print(self.position)
+            print("  Initialized with position =", self.position)
 
-    test = TestClass((3, 5))
-    print(type(test.position))
+    test1 = TestClass((3, 5))
+    print("Type of test1.position:", type(test1.position))
+    test1.position = (6, 7)
+    print("After setting tuple (6,7):", test1.position, "| type:", type(test1.position))
+    test1.position[0] += 1
+    print("After incrementing y by 1:", test1.position)
+    print()
 
-    test.position = (6, 7)
+    print("=== Shared State Check ===")
+    test2 = TestClass((3, 5))
+    print("  test2.position:", test2.position)
+    test2.position = test1.position
+    print(
+        "After test2.position = test1.position ->",
+        test2.position,
+        "test1.position =",
+        test1.position,
+    )
 
-    print(type(test.position))
-
-    test.position[0] += 1
-    print(test.position)
+    test1.position[0] = 1
+    test1.position[1] = 2
+    print("\nAfter changing test1.position to (1,2):")   # I want it to be able to be referenced that easily for later movement of the pawn with the cursor for example
+    print("  test1.position:", test1.position)
+    print("  test2.position:", test2.position)

@@ -7,10 +7,9 @@ if __name__ == "__main__":
 
     sys.path.append(dirname(dirname(abspath(__file__))))
 
+from data_loaders.class_registry import register_game_object_class
 from data_loaders.texture_registry import TextureRegistry
-from utils.class_registry import register_game_object_class, resolve_game_object_class
 from utils.connection_list import ConnectorList
-from utils.game_object_registry import register_game_object
 from utils.position import Position2D
 from utils.validators import PositiveInt
 
@@ -32,23 +31,17 @@ class GameObject:
         if kwargs:
             self.load(kwargs)
 
-        register_game_object(self)
-
     def load(self, data: dict[str, Any]):
-        self.position = data.get("position", (0, 0))
+        pos_data = data.get("position", None)
+        if pos_data:
+            self.position = Position2D.from_dict(pos_data)
+
         self.id = data.get("id", 0)
 
         tex = data.get("texture", None)
 
         if tex:
-            _tex_name = tex.get("name", None)
-            _tex_size = tex.get("size", None)
-
-            if _tex_name:
-                self.texture = TextureRegistry.instance()[_tex_name]
-
-            if _tex_size and self.texture.size != tuple(_tex_size):
-                raise ValueError("error with loaded texture size")
+            self.texture = TextureRegistry.from_dict(tex)
 
         try:
             super().load(data)
@@ -73,11 +66,8 @@ class GameObject:
             {
                 "__type__": self.__class__.__name__,
                 "id": self.id,
-                "position": list(self.position),
-                "texture": {
-                    "name": getattr(self.texture, "name", None),
-                    "size": list(getattr(self.texture, "size", None)),
-                },
+                "position": self.position.to_dict(),
+                "texture": self.texture.to_dict(),
             }
         )
         ### GAME OBJECT SERIALIZATION ###
@@ -85,8 +75,8 @@ class GameObject:
         return base
 
     @classmethod
-    def from_dict(_, data):
-        return resolve_game_object_class(data["__type__"])(**data)
+    def from_dict(cls, data):
+        return cls(**data)
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
@@ -113,13 +103,11 @@ class Connectable:
         if kwargs:
             self.load(kwargs)
 
-        register_game_object(self)
-
     def load(self, data: dict[str, Any]):
         self.connections.update(
             {
-                name: ConnectorList.from_dict(info)
-                for name, info in data.get("connections", {}).items()
+                class_name: ConnectorList.from_dict(info)
+                for class_name, info in data.get("connections", {}).items()
             }
         )
 
@@ -133,6 +121,10 @@ class Connectable:
             self.connections[obj.__class__.__name__].append_at(obj, pos)
         except Exception as e:
             raise ValueError(f"Failed to connect {obj} at {pos}: {e}") from e
+
+    def connect_after_load(self):
+        for connector_list in self.connections.values():
+            connector_list.connect_from_previous_load()
 
     #
     ### Json serialization methods ###
@@ -171,7 +163,7 @@ if __name__ == "__main__":
     data = {
         "__type__": "GameObject",
         "id": 1,
-        "position": [12, 3],
+        "position": {"y": 12, "x": 3},
         "texture": {
             "name": "pawn_player0",
             "size": [3, 6],

@@ -1,86 +1,32 @@
-import curses
+import threading
 import time
 
-from data_loaders.terminal_texture import Texture
-from data_loaders.texture_registry import TextureRegistry
-from game_objects.cursor import Cursor
-from game_objects.display import Display
+from data_loaders.game_object_registry import all_game_objects_generator
+from data_loaders.objects_reader import load_game_objects
+from game_objects.display import CursesDisplay
 
 
-def main(stdscr):
-    curses.curs_set(0)
-    stdscr.nodelay(1)
+def worker(display: CursesDisplay):
+    display.ui_ready.wait()
 
-    display = Display((40, 20))
+    with display.state_lock:
+        display.cursor1.move_down()
 
-    cursor_texture = Texture("cursor", ["a██a"])
+    for _ in range(5):
+        time.sleep(0.2)
+        with display.state_lock:
+            display.cursor1.move_down()
 
-    TextureRegistry.register(cursor_texture)
 
-    cursor = Cursor((40, 20), texture={"name": "cursor"}, id=1, position=(20, 10))
+def main():
+    display = CursesDisplay((90, 90), 50)
 
-    cursor_color = 4
+    load_game_objects(3)
 
-    running = True
-    frame = 0
-    status_message = "Welcome to Display Demo"
+    threading.Thread(target=worker, daemon=True, args=(display,)).start()
 
-    while running:
-        stdscr.clear()
-        draw_more = display.draw_basic_display(stdscr)
-        if draw_more:
-            height, width = stdscr.getmaxyx()
-
-            title = "Interactive Display Demo"
-            display.draw_colored_text(stdscr, 1, (width - len(title)) // 2, title, 1)
-
-            instructions = [
-                "← → ↑ ↓ : Move cursor",
-                "c: Change cursor color",
-                "q: Quit",
-            ]
-
-            for i, instruction in enumerate(instructions):
-                display.draw_colored_text(stdscr, i + 3, 2, instruction, 3)
-
-            display.draw_element(stdscr, cursor.render, cursor_color)
-
-            display.draw_status_bar(stdscr, status_message)
-
-            stdscr.refresh()
-            try:
-                key = stdscr.getch()
-            except Exception:
-                key = -1
-
-            if key == ord("q"):
-                running = False
-            elif key == curses.KEY_UP and cursor.position[0] > 0:
-                cursor.move_up()
-                status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
-            elif key == curses.KEY_DOWN and cursor.position[0] < height - 2:
-                cursor.move_down()
-                status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
-            elif key == curses.KEY_LEFT and cursor.position[1] > 0:
-                cursor.move_left()
-                status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
-            elif key == curses.KEY_RIGHT and cursor.position[1] < width - 2:
-                cursor.move_right()
-                status_message = f"Cursor position: y={cursor.position[0]}, x={cursor.position[1]}"
-            elif key == ord("c"):
-                cursor_color = (cursor_color % 4) + 1
-                color_names = {1: "Cyan", 2: "Red", 3: "Green", 4: "Yellow"}
-                status_message = f"Cursor color: {color_names[cursor_color]}"
-
-            frame += 1
-        else:
-            stdscr.refresh()
-
-        time.sleep(0.03)
+    display.run(gen_objs_acces_func=all_game_objects_generator)
 
 
 if __name__ == "__main__":
-    try:
-        curses.wrapper(main)
-    except KeyboardInterrupt:
-        pass
+    main()

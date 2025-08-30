@@ -74,6 +74,21 @@ class TextureRegistry(Sequence):
         cls.instance()._textures[texture.name] = texture
 
     @classmethod
+    def from_dict(cls, data):
+        _tex_name = data.get("name", None)
+        _tex_size = data.get("size", None)
+
+        if _tex_name:
+            tex = cls.instance()[_tex_name]
+        else:
+            raise ValueError("Texture name is required to load from dict")
+
+        if _tex_size and tex.size != tuple(_tex_size):
+            raise ValueError("error with loaded texture size")
+
+        return tex
+
+    @classmethod
     def instance(cls):
         if cls._instance is None:
             raise RuntimeError("Textures not loaded. Initialize the registry")
