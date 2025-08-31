@@ -1,4 +1,3 @@
-import threading
 import time
 
 from data_loaders.game_object_registry import all_game_objects_generator
@@ -6,16 +5,29 @@ from data_loaders.objects_reader import load_game_objects
 from game_objects.display import CursesDisplay
 
 
-def worker(display: CursesDisplay):
-    display.ui_ready.wait()
+def move_cursor(display):
+    next_frame_time = 0.0
+    no_moves = 0
+    moving_right = True
 
-    with display.state_lock:
-        display.cursor1.move_down()
+    def do_action():
+        nonlocal next_frame_time, no_moves, moving_right
+        if time.perf_counter() >= next_frame_time:
+            if no_moves < 40 and moving_right:
+                display.cursor2.move_right()
+                no_moves += 1
+            elif no_moves > 0 and not moving_right:
+                display.cursor2.move_left()
+                no_moves -= 1
 
-    for _ in range(5):
-        time.sleep(0.2)
-        with display.state_lock:
-            display.cursor1.move_down()
+            if no_moves == 40:
+                moving_right = False
+            elif no_moves == 0:
+                moving_right = True
+
+            next_frame_time = time.perf_counter() + 1 / 50
+
+    return do_action
 
 
 def main():
@@ -23,9 +35,13 @@ def main():
 
     load_game_objects(3)
 
-    threading.Thread(target=worker, daemon=True, args=(display,)).start()
+    tasks = [display._render_process(all_game_objects_generator), move_cursor(display)]
 
-    display.run(gen_objs_acces_func=all_game_objects_generator)
+    while display.running:
+        for task in tasks:
+            task()
+
+    display._close_curses()
 
 
 if __name__ == "__main__":

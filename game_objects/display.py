@@ -1,5 +1,4 @@
 import curses
-import threading
 import time
 from abc import ABC, abstractmethod
 from typing import Callable
@@ -31,37 +30,21 @@ class CursesDisplay(Display):  # renders only terminal textures
         self.cursor1 = Cursor(size, texture={"name": "cursor"}, id=1, position={"y": 1, "x": 1})
         self.cursor2 = Cursor(size, texture={"name": "cursor"}, id=2, position={"y": 10, "x": 1})
 
+        self._init_curses()
+        self._next_frame = 0.0
+
         self.running = True
-        self.state_lock = threading.RLock()
-        self.ui_ready = threading.Event()
 
-    def run(self, stdscr=None, gen_objs_acces_func=None):
-        if not stdscr and not self.output:
-            curses.wrapper(self.run, gen_objs_acces_func)
-            return
-        elif stdscr and not self.output:
-            self.output = stdscr
-            self._init_curses()
-            self.ui_ready.set()
+    def _render_process(self, gen_objs_acces_func=None):
+        def do_render():
+            if self.running and (time.perf_counter() >= self._next_frame):
+                _start = time.perf_counter()
+                self._input_procces()
+                self.render_frame(gen_objs_acces_func)
 
-        self._continous_render_process(gen_objs_acces_func=gen_objs_acces_func)
+                self._next_frame = _start + self._goal_refresh_time
 
-    def _continous_render_process(self, gen_objs_acces_func=None):
-        next_tick = time.perf_counter()
-
-        while self.running:
-            self._input_procces()
-            self.render_frame(gen_objs_acces_func)
-
-            next_tick += self._goal_refresh_time
-            now = time.perf_counter()
-            sleep_s = next_tick - now
-
-            if sleep_s > 0:
-                time.sleep(sleep_s)
-            else:
-                while next_tick <= now:
-                    next_tick += self._goal_refresh_time
+        return do_render
 
     def _input_procces(self):
         key = self._get_curr_key()
@@ -69,17 +52,13 @@ class CursesDisplay(Display):  # renders only terminal textures
         if key == ord("q"):
             self.running = False
         elif key == curses.KEY_UP:
-            with self.state_lock:
-                self.cursor1.move_up()
+            self.cursor1.move_up()
         elif key == curses.KEY_DOWN:
-            with self.state_lock:
-                self.cursor1.move_down()
+            self.cursor1.move_down()
         elif key == curses.KEY_LEFT:
-            with self.state_lock:
-                self.cursor1.move_left()
+            self.cursor1.move_left()
         elif key == curses.KEY_RIGHT:
-            with self.state_lock:
-                self.cursor1.move_right()
+            self.cursor1.move_right()
 
     def render_frame(self, gen_objs_acces_func=None):
         self.output.clear()
@@ -101,8 +80,7 @@ class CursesDisplay(Display):  # renders only terminal textures
         color=1,
         bold=False,
     ):
-        with self.state_lock:
-            (y, x), texture, (texture_height, texture_width) = bound_render_func()
+        (y, x), texture, (texture_height, texture_width) = bound_render_func()
 
         y_end, x_end = self._get_drawable_bounds(y, x, texture_width, texture_height)
 
@@ -197,9 +175,12 @@ class CursesDisplay(Display):  # renders only terminal textures
             )
 
     def _init_curses(self):
+        self.output = curses.initscr()
+
         curses.curs_set(0)
         curses.noecho()
         curses.cbreak()
+
         self.output.keypad(True)
         self.output.nodelay(True)
 
@@ -210,3 +191,9 @@ class CursesDisplay(Display):  # renders only terminal textures
         curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+    def _close_curses(self):
+        self.output.keypad(False)
+        curses.echo()
+        curses.nocbreak()
+        curses.endwin()
