@@ -8,7 +8,9 @@
         "size": [
             3,
             6
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "pawn_player0": {
         "graphics": [
@@ -19,7 +21,9 @@
         "size": [
             3,
             6
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "pawn_player1": {
         "graphics": [
@@ -30,7 +34,9 @@
         "size": [
             3,
             6
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "horizontal_line": {
         "graphics": [
@@ -39,7 +45,9 @@
         "size": [
             1,
             6
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "vertical_line": {
         "graphics": [
@@ -50,7 +58,9 @@
         "size": [
             3,
             2
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "diagonal_u_d": {
         "graphics": [
@@ -61,7 +71,9 @@
         "size": [
             3,
             6
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "diagonal_d_u": {
         "graphics": [
@@ -72,7 +84,9 @@
         "size": [
             3,
             6
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "player1_won": {
         "graphics": [
@@ -92,7 +106,9 @@
         "size": [
             12,
             31
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "player2_won": {
         "graphics": [
@@ -112,7 +128,9 @@
         "size": [
             12,
             31
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
     "draw": {
         "graphics": [
@@ -126,15 +144,30 @@
         "size": [
             6,
             18
-        ]
+        ],
+        "color": null,
+        "bold": false
     },
-    "cursor": {
+    "cursorP1": {
         "graphics": [
             "██"
         ],
         "size": [
             1,
             2
-        ]
+        ],
+        "color": null,
+        "bold": false
+    },
+    "cursorP2": {
+        "graphics": [
+            "██"
+        ],
+        "size": [
+            1,
+            2
+        ],
+        "color": null,
+        "bold": false
     }
 }

@@ -1,26 +1,25 @@
 class CannotChange:
     def __init__(self, name=None):
         self._name = name
-
-        self._values = {}
-        self._set_once = {}
+        # Unique per-descriptor attribute names to store data on the instance itself
+        self._values_attr = f"__cc_values_{id(self)}"
+        self._set_flag_attr = f"__cc_set_{id(self)}"
 
     def __set_name__(self, cls, name):
         self.name = name
+        if self._name is None:
+            self._name = name
 
     def __get__(self, instance, cls=None):
-        if instance is None:  # when calling for example CannotChange._values
+        if instance is None:
             return self
-
-        return self._values.get(id(instance), None)
+        return getattr(instance, self._values_attr, None)
 
     def __set__(self, obj, value):
-        obj_id = id(obj)
-        if obj_id in self._set_once:
+        if getattr(obj, self._set_flag_attr, False):
             raise ValueError(f"Cannot change {self._name} - already set")
-
-        self._values[obj_id] = value
-        self._set_once[obj_id] = True
+        setattr(obj, self._values_attr, value)
+        setattr(obj, self._set_flag_attr, True)
 
     def __delete__(self, obj):
         raise Exception("Cannot delete")

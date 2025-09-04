@@ -3,6 +3,7 @@ import time
 from abc import ABC, abstractmethod
 from typing import Callable
 
+from data_loaders.terminal_texture import Texture
 from game_objects.cursor import Cursor
 
 
@@ -31,18 +32,22 @@ class CursesDisplay(Display):  # renders only terminal textures
         self.cursor2 = Cursor(size, texture={"name": "cursor"}, id=2, position={"y": 10, "x": 1})
 
         self._init_curses()
-        self._next_frame = 0.0
 
         self.running = True
 
     def _render_process(self, gen_objs_acces_func=None):
+        _curr_time = time.perf_counter()
+        _next_frame = 0.0
+
         def do_render():
-            if self.running and (time.perf_counter() >= self._next_frame):
-                _start = time.perf_counter()
+            nonlocal _curr_time, _next_frame
+
+            _curr_time = time.perf_counter()
+            if self.running and (_curr_time >= _next_frame):
                 self._input_procces()
                 self.render_frame(gen_objs_acces_func)
 
-                self._next_frame = _start + self._goal_refresh_time
+                _next_frame = _curr_time + self._goal_refresh_time
 
         return do_render
 
@@ -63,38 +68,36 @@ class CursesDisplay(Display):  # renders only terminal textures
     def render_frame(self, gen_objs_acces_func=None):
         self.output.clear()
 
-        self._draw_basic_display()
-
-        if gen_objs_acces_func:
+        if self._draw_basic_display() and gen_objs_acces_func:
             for obj in gen_objs_acces_func():
-                self.draw_element(obj.render, 6)
+                self.draw_texture(obj.render)
 
-        self.draw_element(self.cursor1.render, 1)
-        self.draw_element(self.cursor2.render, 2)
+            self.draw_texture(self.cursor1.render)
+            self.draw_texture(self.cursor2.render)
 
         self.output.refresh()
 
-    def draw_element(
-        self,
-        bound_render_func: Callable[[], tuple[tuple[int, int], tuple[str], tuple[int, int]]],
-        color=1,
-        bold=False,
-    ):
-        (y, x), texture, (texture_height, texture_width) = bound_render_func()
+    def draw_texture(self, bound_render_func: Callable[[], tuple[tuple[int, int], Texture]]):
+        (y, x), texture = bound_render_func()
 
-        y_end, x_end = self._get_drawable_bounds(y, x, texture_width, texture_height)
+        if texture is None:
+            return
 
-        if bold:
+        y_end, x_end = self._get_drawable_bounds(y, x, texture.width, texture.height)
+
+        if texture.bold:
             self.output.attron(curses.A_BOLD)
-        self.output.attron(curses.color_pair(color))
+        if texture.color:
+            self.output.attron(curses.color_pair(texture.color))
 
         for n, row in enumerate(texture[:y_end]):
             visible_row = row[:x_end]
             if visible_row:
                 self.output.addstr(y + n, x, visible_row)
 
-        self.output.attroff(curses.color_pair(color))
-        if bold:
+        if texture.color:
+            self.output.attroff(curses.color_pair(texture.color))
+        if texture.bold:
             self.output.attroff(curses.A_BOLD)
 
     def _draw_status_bar(self, text=None):
@@ -103,18 +106,15 @@ class CursesDisplay(Display):  # renders only terminal textures
 
         if not text:
             text = self.statusbar_text
+
         remaining = self._current_size_x - len(text) - 1
         fill_spaces = " " * max(0, remaining)
 
-        self.draw_element(
-            lambda: (
-                (self._current_size_y - 1, 0),
-                (text + fill_spaces,),
-                (1, self._current_size_x),
-            ),
-            5,
-            True,
-        )
+        text = text + fill_spaces
+
+        self.output.attron(curses.color_pair(5))
+        self.output.addstr(self._current_size_y - 1, 0, text[:self._current_size_x])
+        self.output.attroff(curses.color_pair(5))
 
     #
     #
@@ -141,7 +141,7 @@ class CursesDisplay(Display):  # renders only terminal textures
     def _draw_basic_display(self):  # and handle too small terminal size for the display
         self._current_size_y, self._current_size_x = self.output.getmaxyx()
 
-        if self._current_size_y >= self.size[1] + 1 and self._current_size_x >= self.size[0]:
+        if self._current_size_y >= self.size[0] + 1 and self._current_size_x >= self.size[1]:
             self._draw_status_bar()
             return True
         else:
@@ -149,8 +149,8 @@ class CursesDisplay(Display):  # renders only terminal textures
             return False
 
     def _display_terminal_too_small_message(self):
-        _x_message = abs(min(0, self._current_size_x - self.size[0]))
-        _y_message = abs(min(0, self._current_size_y - (self.size[1] + 1)))
+        _x_message = abs(min(0, self._current_size_x - self.size[1]))
+        _y_message = abs(min(0, self._current_size_y - (self.size[0] + 1)))
 
         _message = (
             "board can't fit",
@@ -160,19 +160,23 @@ class CursesDisplay(Display):  # renders only terminal textures
         )
         _max_len = max(len(msg) for msg in _message)
 
-        start_x_message = int((self._current_size_x // 2) - (_max_len // 2) - _max_len % 2)
-        start_y_message = int(self._current_size_y // 2)
+        start_x_message = int(
+            (min(self.size[1], self._current_size_x) // 2) - (_max_len // 2) - _max_len % 2
+        )
+        start_y_message = int(min(self.size[0], self._current_size_y // 2)) - 2
+
+        self.output.attron(curses.color_pair(2))
+        self.output.attron(curses.A_BOLD)
 
         if self._current_size_x > 4:
-            self.draw_element(
-                lambda: ((start_y_message, start_x_message), _message, (4, _max_len)), 2, True
-            )
+            for line in _message:
+                self.output.addstr(start_y_message, start_x_message, line[:self._current_size_x])
         else:
-            self.draw_element(
-                lambda: ((start_y_message, start_x_message), (_message[0],), (1, len(_message[0]))),
-                2,
-                True,
-            )
+            self.output.addstr(start_y_message, start_x_message, _message[0][:self._current_size_x])
+
+        self.output.attroff(curses.A_BOLD)
+        self.output.attroff(curses.color_pair(2))
+
 
     def _init_curses(self):
         self.output = curses.initscr()
@@ -190,7 +194,6 @@ class CursesDisplay(Display):  # renders only terminal textures
         curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
         curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
     def _close_curses(self):
         self.output.keypad(False)

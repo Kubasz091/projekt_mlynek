@@ -29,16 +29,14 @@ class Typed(Validator):
                 raise TypeError(f"Expected {type_names}, got {type(value).__name__}")
         else:
             if not isinstance(value, cls.expected_type):
-                raise TypeError(
-                    f"Expected {cls.expected_type.__name__}, got {type(value).__name__}"
-                )
+                raise TypeError(f"Expected {cls.expected_type.__name__}, got {type(value).__name__}")
         return super().check(value)
 
 
 class NonEmpty(Validator):
     @classmethod
     def check(cls, value):
-        if not value:
+        if value is None or (isinstance(value, (str, list, tuple, dict)) and len(value) == 0):
             raise ValueError("Must be non-empty/ not NaN")
         return super().check(value)
 

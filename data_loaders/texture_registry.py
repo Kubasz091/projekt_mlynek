@@ -36,9 +36,7 @@ class TextureRegistry(Sequence):
                 texture_data = json.load(file)
 
             for name, data in texture_data.items():
-                self._textures[name] = Texture(name, data["graphics"], tuple(data["size"]))
-
-            self._textures["no texture"] = Texture("no texture", ["no texture"])
+                self._textures[name] = Texture(name, data["graphics"], data["color"], data["bold"], tuple(data["size"]))
 
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Texture file not found: {path}") from e
@@ -95,9 +93,13 @@ class TextureRegistry(Sequence):
         return cls._instance
 
 
-_ = TextureRegistry(_TERMINAL_GRAPHICS_PATH)
+def load_textures():
+    _ = TextureRegistry(_TERMINAL_GRAPHICS_PATH)
+
 
 if __name__ == "__main__":
+    load_textures()
+
     registry2 = TextureRegistry.instance()
     print("Available textures:", registry2.list_textures())
 

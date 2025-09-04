@@ -59,7 +59,14 @@ class Position2D(Sequence):
         else:
             instance.__dict__[self.name] = Position2D(value)
 
-    #
+    # PROPERTIES
+    @property
+    def y(self) -> int:
+        return self._y
+
+    @property
+    def x(self) -> int:
+        return self._x
 
     def __str__(self) -> str:
         return f"({self._y}, {self._x})"
@@ -120,6 +127,8 @@ if __name__ == "__main__":
 
     test1.position[0] = 1
     test1.position[1] = 2
-    print("\nAfter changing test1.position to (1,2):")   # I want it to be able to be referenced that easily for later movement of the pawn with the cursor for example
+    print(
+        "\nAfter changing test1.position to (1,2):"
+    )  # I want it to be able to be referenced that easily for later movement of the pawn with the cursor for example
     print("  test1.position:", test1.position)
     print("  test2.position:", test2.position)

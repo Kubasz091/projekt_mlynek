@@ -2,7 +2,8 @@ import time
 
 from data_loaders.game_object_registry import all_game_objects_generator
 from data_loaders.objects_reader import load_game_objects
-from game_objects.display import CursesDisplay
+from data_loaders.texture_registry import load_textures
+from utils.display import CursesDisplay
 
 
 def move_cursor(display):
@@ -31,15 +32,24 @@ def move_cursor(display):
 
 
 def main():
-    display = CursesDisplay((90, 90), 50)
+    load_textures()
 
-    load_game_objects(3)
+    display = CursesDisplay((30, 80), 50)
+    try:
+        load_game_objects(3)
 
-    tasks = [display._render_process(all_game_objects_generator), move_cursor(display)]
+        tasks = [display._render_process(all_game_objects_generator), move_cursor(display)]
 
-    while display.running:
-        for task in tasks:
-            task()
+        while display.running:
+            for task in tasks:
+                task()
+
+    except Exception as e:
+        display._close_curses()
+        raise e
+
+    except KeyboardInterrupt:
+        pass
 
     display._close_curses()
 

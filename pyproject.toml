@@ -1,12 +1,12 @@
 [tool.ruff]
-line-length = 100
+line-length = 140
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "C4", "B"]
 ignore = []
 
 [tool.black]
-line-length = 100
+line-length = 140
 
 [tool.pytest.ini_options]
 minversion = "6.0"

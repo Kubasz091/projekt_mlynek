@@ -13,9 +13,19 @@ from utils.validators import NonEmpty, RectangularStringTuple
 class Texture(Sequence):
     _texture = RectangularStringTuple()
     _name = NonEmpty()
+    _bold = NonEmpty()
 
-    def __init__(self, name: str, texture: list[str], size: tuple[int, int] | None = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        texture: list[str],
+        color: int | None = None,
+        bold: bool = False,
+        size: tuple[int, int] | None = None,
+    ) -> None:
         self._name = name
+        self._color = color
+        self._bold = bold
         self._change_texture(texture, size)
 
     #
@@ -52,6 +62,26 @@ class Texture(Sequence):
     @property
     def size(self) -> tuple[int, int]:
         return self._size
+
+    @property
+    def height(self) -> int:
+        return self._size[0]
+
+    @property
+    def width(self) -> int:
+        return self._size[1]
+
+    @property
+    def texture(self) -> tuple[str, ...]:
+        return self._texture
+
+    @property
+    def color(self) -> int:
+        return self._color
+
+    @property
+    def bold(self) -> bool:
+        return self._bold
 
     @property
     def name(self) -> str:
