@@ -28,8 +28,8 @@ class CursesDisplay(Display):  # renders only terminal textures
 
         self.statusbar_text = "Press 'q' to exit | 'e' to move pawns | '←↑→↓' to Move"
 
-        self.cursor1 = Cursor(size, texture={"name": "cursor"}, id=1, position={"y": 1, "x": 1})
-        self.cursor2 = Cursor(size, texture={"name": "cursor"}, id=2, position={"y": 10, "x": 1})
+        self.cursor1 = Cursor(size, texture={"name": "cursorP1"}, id=1, position={"y": 0, "x": 8})
+        self.cursor2 = Cursor(size, texture={"name": "cursorP2"}, id=2, position={"y": 12, "x": 0})
 
         self._init_curses()
 
@@ -105,7 +105,7 @@ class CursesDisplay(Display):  # renders only terminal textures
             return
 
         if not text:
-            text = self.statusbar_text
+            text = self.statusbar_text + f" cursor1 pos {self.cursor1.position}"
 
         remaining = self._current_size_x - len(text) - 1
         fill_spaces = " " * max(0, remaining)
@@ -113,7 +113,7 @@ class CursesDisplay(Display):  # renders only terminal textures
         text = text + fill_spaces
 
         self.output.attron(curses.color_pair(5))
-        self.output.addstr(self._current_size_y - 1, 0, text[:self._current_size_x])
+        self.output.addstr(self._current_size_y - 1, 0, text[: self._current_size_x])
         self.output.attroff(curses.color_pair(5))
 
     #
@@ -160,9 +160,7 @@ class CursesDisplay(Display):  # renders only terminal textures
         )
         _max_len = max(len(msg) for msg in _message)
 
-        start_x_message = int(
-            (min(self.size[1], self._current_size_x) // 2) - (_max_len // 2) - _max_len % 2
-        )
+        start_x_message = int((min(self.size[1], self._current_size_x) // 2) - (_max_len // 2) - _max_len % 2)
         start_y_message = int(min(self.size[0], self._current_size_y // 2)) - 2
 
         self.output.attron(curses.color_pair(2))
@@ -170,13 +168,12 @@ class CursesDisplay(Display):  # renders only terminal textures
 
         if self._current_size_x > 4:
             for line in _message:
-                self.output.addstr(start_y_message, start_x_message, line[:self._current_size_x])
+                self.output.addstr(start_y_message, start_x_message, line[: self._current_size_x])
         else:
-            self.output.addstr(start_y_message, start_x_message, _message[0][:self._current_size_x])
+            self.output.addstr(start_y_message, start_x_message, _message[0][: self._current_size_x])
 
         self.output.attroff(curses.A_BOLD)
         self.output.attroff(curses.color_pair(2))
-
 
     def _init_curses(self):
         self.output = curses.initscr()

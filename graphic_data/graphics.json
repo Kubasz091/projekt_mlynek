@@ -12,7 +12,7 @@
         "color": null,
         "bold": false
     },
-    "pawn_player0": {
+    "pawn_player1": {
         "graphics": [
             "██████",
             "██╬╬██",
@@ -22,10 +22,10 @@
             3,
             6
         ],
-        "color": null,
+        "color": "red",
         "bold": false
     },
-    "pawn_player1": {
+    "pawn_player2": {
         "graphics": [
             "██████",
             "██░░██",
@@ -35,7 +35,7 @@
             3,
             6
         ],
-        "color": null,
+        "color": "green",
         "bold": false
     },
     "horizontal_line": {
@@ -107,7 +107,7 @@
             12,
             31
         ],
-        "color": null,
+        "color": "red",
         "bold": false
     },
     "player2_won": {
@@ -129,7 +129,7 @@
             12,
             31
         ],
-        "color": null,
+        "color": "green",
         "bold": false
     },
     "draw": {
@@ -156,7 +156,7 @@
             1,
             2
         ],
-        "color": null,
+        "color": "red",
         "bold": false
     },
     "cursorP2": {
@@ -167,7 +167,7 @@
             1,
             2
         ],
-        "color": null,
+        "color": "green",
         "bold": false
     }
 }

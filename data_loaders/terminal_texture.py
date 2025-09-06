@@ -9,6 +9,8 @@ if __name__ == "__main__":
 
 from utils.validators import NonEmpty, RectangularStringTuple
 
+_TEXTURE_COLOR_MAPPING = {"blue": 1, "red": 2, "green": 3, "yellow": 4}
+
 
 class Texture(Sequence):
     _texture = RectangularStringTuple()
@@ -19,12 +21,12 @@ class Texture(Sequence):
         self,
         name: str,
         texture: list[str],
-        color: int | None = None,
+        color: str | None = None,
         bold: bool = False,
         size: tuple[int, int] | None = None,
     ) -> None:
         self._name = name
-        self._color = color
+        self._color = _TEXTURE_COLOR_MAPPING.get(color, None)
         self._bold = bold
         self._change_texture(texture, size)
 

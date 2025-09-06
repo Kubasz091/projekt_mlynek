@@ -30,8 +30,10 @@ class TextureRegistry(Sequence):
 
         TextureRegistry._initialized = True
 
-    def _load(self, path: str) -> None:
+    def _load(self, path: str = None) -> None:
         try:
+            if path is None:
+                path = _TERMINAL_GRAPHICS_PATH
             with open(path) as file:
                 texture_data = json.load(file)
 
@@ -45,14 +47,15 @@ class TextureRegistry(Sequence):
         except Exception as e:
             raise RuntimeError(f"Unexpected error loading texture file: {path}: {e}") from e
 
+    def clear_data(self):
+        self._textures.clear()
+
     def __getitem__(self, texture_name: str) -> Texture:
         if not TextureRegistry._initialized:
             raise RuntimeError("Textures not loaded. Initialize the registry")
 
         if texture_name not in self._textures:
-            raise KeyError(
-                f"Texture '{texture_name}' not found. Available textures: {list(self._textures.keys())}"
-            )
+            raise KeyError(f"Texture '{texture_name}' not found. Available textures: {list(self._textures.keys())}")
 
         return self._textures[texture_name]
 

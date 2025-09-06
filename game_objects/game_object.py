@@ -133,10 +133,7 @@ class Connectable:
             y, x = self.identifier_hitbox.shape
             self.hitbox_size = (y + 2 * self.allign_offset, x + 2 * self.allign_offset)
 
-        for class_name, hitbox_dict in data.get("connector_hitboxes", {}).items():
-            self.connector_hitboxes[class_name] = HitboxMap.from_dict(hitbox_dict)
-            if not hasattr(hitbox_dict, "hitbox_array"):
-                self.update_hitbox_map(class_name)
+        self.update_hitbox_map()
 
         if not hasattr(self, "id"):
             self.id = data.get("id", 0)
@@ -248,9 +245,9 @@ class Connectable:
         for class_name, connector_list in self.connections.items():
             connections_data[class_name] = connector_list.to_dict()
 
-        hitbox_data = {}
-        for class_name, hitbox_map in self.connector_hitboxes.items():
-            hitbox_data[class_name] = hitbox_map.to_dict()
+        # hitbox_data = {}
+        # for class_name, hitbox_map in self.connector_hitboxes.items():
+        #     hitbox_data[class_name] = hitbox_map.to_dict()
         ### CONNECTION SERIALIZATION ###
 
         if self.hitbox_size == (0, 0) and hasattr(self, "identifier_hitbox"):
@@ -260,7 +257,7 @@ class Connectable:
         base.update(
             {
                 "connections": connections_data,
-                "connector_hitboxes": hitbox_data,
+                # "connector_hitboxes": hitbox_data,
                 "hitbox_size": self.hitbox_size,
                 "allign_offset": self.allign_offset,
             }

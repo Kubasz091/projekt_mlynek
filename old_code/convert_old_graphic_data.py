@@ -42,31 +42,36 @@ for size in range(3, 15, 3):
 
     diagonal_d_u_pos = board_data.get("diagonal_d_u", None)
 
+    x_adjustment = 10
+
+    if size == 12:
+        x_adjustment = 18
+
     tmp = []
     for pos in dot_positions:
-        tmp.append((pos[1], pos[0] + 10))
+        tmp.append((pos[1], pos[0] + x_adjustment))
     dot_positions = tmp
 
     tmp = []
     for pos in horizontal_line_pos:
-        tmp.append((pos[1], pos[0] + 10))
+        tmp.append((pos[1], pos[0] + x_adjustment))
     horizontal_line_pos = tmp
 
     tmp = []
     for pos in vertical_line_pos:
-        tmp.append((pos[1], pos[0] + 10))
+        tmp.append((pos[1], pos[0] + x_adjustment))
     vertical_line_pos = tmp
 
     if diagonal_u_d_pos is not None:
         tmp = []
         for pos in diagonal_u_d_pos:
-            tmp.append((pos[1] + 1, pos[0] + 11))
+            tmp.append((pos[1] + 1, pos[0] + 1 + x_adjustment))
         diagonal_u_d_pos = tmp
 
     if diagonal_d_u_pos is not None:
         tmp = []
         for pos in diagonal_d_u_pos:
-            tmp.append((pos[1] + 1, pos[0] + 11))
+            tmp.append((pos[1] + 1, pos[0] + 1 + x_adjustment))
         diagonal_d_u_pos = tmp
 
     print("Dot Positions:", dot_positions)
@@ -88,7 +93,7 @@ for size in range(3, 15, 3):
         obj = Field(position={"y": pos[0], "x": pos[1]}, texture={"name": "dot"}, allign_offset=1)
         register_game_object(obj)
 
-    change_board_size((max_y, max_x + 10))
+    change_board_size((max_y + 1, max_x + 1 + x_adjustment))
 
     connection_dict = {
         "Field": {
@@ -319,38 +324,69 @@ for size in range(3, 15, 3):
     print(f"Changed {changed_connectors} edge connectors from field connectors to edge connectors.")
     print(f"Sucessfully connected {sucessfull_connects} fields and {edge_connections} edges. In the board of size {size}.")
 
-    board_data = {
-        "id": 1,
-        "connections": {
-            "PawnP1": {
-                "class_name": "PawnP1",
-                "connector_data": {
-                    i + 1: {
-                        "id": i + 1,
-                        "position": {"y": 1 + (4 * i), "x": 2},
-                        "allign_offset": 0,
-                        "obj": None,
-                    }
-                    for i in range(size)
+    if size == 12:
+        board_data = {
+            "id": 1,
+            "connections": {
+                "PawnP1": {
+                    "class_name": "PawnP1",
+                    "connector_data": {
+                        i + 1: {
+                            "id": i + 1,
+                            "position": {"y": 1 + (4 * (i % 6)), "x": 2 + (8 * (i // 6))},
+                            "allign_offset": 0,
+                            "obj": None,
+                        }
+                        for i in range(size)
+                    },
+                },
+                "PawnP2": {
+                    "class_name": "PawnP2",
+                    "connector_data": {
+                        i + 1: {
+                            "id": i + 1,
+                            "position": {"y": 1 + (4 * (i % 6)), "x": max_x + 7 + (8 * (i // 6))},
+                            "allign_offset": 0,
+                            "obj": None,
+                        }
+                        for i in range(size)
+                    },
                 },
             },
-            "PawnP2": {
-                "class_name": "PawnP2",
-                "connector_data": {
-                    i + 1: {
-                        "id": i + 1,
-                        "position": {"y": 1 + (4 * i), "x": max_x + 7},
-                        "allign_offset": 0,
-                        "obj": None,
-                    }
-                    for i in range(size)
+        }
+    else:
+        board_data = {
+            "id": 1,
+            "connections": {
+                "PawnP1": {
+                    "class_name": "PawnP1",
+                    "connector_data": {
+                        i + 1: {
+                            "id": i + 1,
+                            "position": {"y": 1 + (4 * i), "x": 2},
+                            "allign_offset": 0,
+                            "obj": None,
+                        }
+                        for i in range(size)
+                    },
+                },
+                "PawnP2": {
+                    "class_name": "PawnP2",
+                    "connector_data": {
+                        i + 1: {
+                            "id": i + 1,
+                            "position": {"y": 1 + (4 * i), "x": max_x + 7},
+                            "allign_offset": 0,
+                            "obj": None,
+                        }
+                        for i in range(size)
+                    },
                 },
             },
-        },
-    }
+        }
 
     # Board now requires size argument
-    board = Board((max_y, max_x + 10), texture={"name": "dot"}, **board_data)
+    board = Board(texture={"name": "dot"}, **board_data)  # (max_y, max_x + 10)
     register_game_object(board)
 
     pawn_connection_data = {
@@ -367,12 +403,12 @@ for size in range(3, 15, 3):
             if class_name == "PawnP1":
                 obj = PawnP1(
                     position={"y": connector.pos.y - 1, "x": connector.pos.x - 2},
-                    texture={"name": "pawn_player0"},
+                    texture={"name": "pawn_player1"},
                 )
             elif class_name == "PawnP2":
                 obj = PawnP2(
                     position={"y": connector.pos.y - 1, "x": connector.pos.x - 2},
-                    texture={"name": "pawn_player1"},
+                    texture={"name": "pawn_player2"},
                 )
             else:
                 raise ValueError(f"Unknown class name in board connections: {class_name}")
@@ -394,13 +430,13 @@ for size in range(3, 15, 3):
 
     save_dict = {
         "objects": game_objects_to_dict(),
-        "display_size": {"y": max_y, "x": max_x + 10},
+        "display_size": {"y": max_y + 1, "x": max_x + 1 + x_adjustment},
         "graphic_data_path": _TERMINAL_GRAPHICS_PATH,
     }
 
     # save to json
-    os.makedirs("graphic_data_test", exist_ok=True)
-    with open(f"graphic_data_test/graphic_data_size_{size}.json", "w") as f:
+    os.makedirs("graphic_data", exist_ok=True)
+    with open(f"graphic_data/board_size_{size}.json", "w") as f:
         json.dump(save_dict, f, indent=4)
 
     _GAME_OBJECT_REGISTRY.clear()

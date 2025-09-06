@@ -1,11 +1,11 @@
 from game_objects.game_object import GameObject
 
 
-class Cursor(GameObject):
+class Cursor(GameObject):  # make it able to move the pawns around
     def __init__(self, bounds: tuple[int, int], **kwargs):
         super().__init__(**kwargs)
 
-        self.bounds = bounds
+        self.bounds = (bounds[0] - 1, bounds[1] - 1)
 
     def move_up(self):
         if self.position[0] >= 1:
