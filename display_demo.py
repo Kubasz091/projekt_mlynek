@@ -6,6 +6,7 @@ from data_loaders.objects_reader import load_game_objects
 from data_loaders.texture_registry import load_textures
 from utils.display import CursesDisplay
 from game_objects import (pawn, board, cursor, edge, field)
+from game_objects.game_lord import GameLord
 
 
 def move_cursor(display):
@@ -17,10 +18,10 @@ def move_cursor(display):
         nonlocal next_frame_time, no_moves, moving_right
         if time.perf_counter() >= next_frame_time:
             if no_moves < 25 and moving_right:
-                display.cursor2.move_right()
+                display.cursor1.move_right()
                 no_moves += 1
             elif no_moves > 0 and not moving_right:
-                display.cursor2.move_left()
+                display.cursor1.move_left()
                 no_moves -= 1
 
             if no_moves == 25:
@@ -39,10 +40,11 @@ def main():
     display = None
 
     try:
-        load_game_objects(12)
+        load_game_objects(3)
         display = CursesDisplay(tuple(gor._BOARD_SIZE), 50)
+        game_lord = GameLord._instance
 
-        tasks = [display._render_process(all_game_objects_generator), move_cursor(display)]
+        tasks = [display._render_process(all_game_objects_generator), move_cursor(display), game_lord.catch_check(display.cursor2, display.input_key_pass)]
 
         while display.running:
             for task in tasks:

@@ -8,6 +8,8 @@ import json
 import os
 from typing import cast
 
+import numpy as np
+
 from data_loaders.game_object_registry import (
     _GAME_OBJECT_REGISTRY,
     change_board_size,
@@ -21,6 +23,7 @@ from data_loaders.texture_registry import _TERMINAL_GRAPHICS_PATH, load_textures
 from game_objects.board import Board
 from game_objects.edge import Edge
 from game_objects.field import Field
+from game_objects.hitboxes import FullCoverageMap
 from game_objects.pawn import PawnP1, PawnP2
 from old_code.graphic_data import GraphicData
 from utils.connection_list import Connector, ConnectorList
@@ -231,7 +234,7 @@ for size in range(3, 15, 3):
                     field_pos = field.position
                     possible_field_connector_positions = [
                         (field_pos.y, field_pos.x + 2),  # up
-                        (field_pos.y + 2, field_pos.x + 2),  # down
+                        (field_pos.y + 2, field_pos.x + 2),  # down-
                         (field_pos.y + 1, field_pos.x),  # left
                         (field_pos.y + 1, field_pos.x + 5),  # right
                         (field_pos.y, field_pos.x),  # up-left
@@ -386,17 +389,17 @@ for size in range(3, 15, 3):
         }
 
     # Board now requires size argument
-    board = Board(texture={"name": "dot"}, **board_data)  # (max_y, max_x + 10)
+    board = Board(**board_data)  # (max_y, max_x + 10)
     register_game_object(board)
 
-    pawn_connection_data = {
-        "Board": {
-            "class_name": "Board",
-            "connector_data": [
-                {"position": {"y": 1, "x": 2}, "obj": {"id": 1, "class_name": "Board"}},
-            ],
-        }
-    }
+    # pawn_connection_data = {
+    #     "Board": {
+    #         "class_name": "Board",
+    #         "connector_data": [
+    #             {"position": {"y": 1, "x": 2}, "obj": {"id": 1, "class_name": "Board"}},
+    #         ],
+    #     }
+    # }
 
     for class_name, connection_list in board.connections.items():
         for connector_id, connector in connection_list._dict.items():
@@ -428,8 +431,117 @@ for size in range(3, 15, 3):
 
     reasing_put_away_objs_ids()
 
+    fc_map = FullCoverageMap(max_y + 1, max_x + 1 + x_adjustment)
+
+    curr_mill_id = 1
+
+    # y, x
+    direction_map = {
+        (1, 5): "right",
+        (1, 0): "left",
+        (0, 2): "up",
+        (2, 2): "down",
+        (2, 5): "down-right",
+        (0, 5): "up-right",
+        (2, 0): "down-left",
+        (0, 0): "up-left",
+    }
+
+    def find_next_field_in_direction(start_field, direction, direction_map):
+        for connector in start_field.connections["Edge"]._dict.values():
+            if connector.obj is not None:
+                # direction check
+                connector_direction = direction_map.get((connector.pos.y, connector.pos.x), None)
+                if connector_direction == direction:
+                    # find the field on the other side of the edge
+                    next_field = None
+                    current_edge = connector.obj
+                    last_connector = connector.connector
+
+                    while next_field is None:
+                        if len(current_edge.connections["Field"]) > 0:
+                            for field_obj_connector in current_edge.connections["Field"]._dict.values():
+                                field = field_obj_connector.obj
+                                if field.id != start_field.id:
+                                    next_field = field
+                                    return next_field, connector, field_obj_connector.connector
+
+                        for edge_connector in current_edge.connections["Edge"]._dict.values():
+                            if edge_connector.id != last_connector.id and edge_connector.obj is not None:
+                                last_connector = edge_connector.connector
+                                current_edge = edge_connector.obj
+                                break
+        return None, None, None
+
+    help_dict = {}
+    # create mills
+    for field_obj in _GAME_OBJECT_REGISTRY["Field"].values():
+        field_no_1 = cast(Field, field_obj)
+        if field_no_1.id not in help_dict:
+            help_dict[field_no_1.id] = {}
+
+        for connector in field_no_1.connections["Edge"]._dict.values():
+            if connector.id not in help_dict[field_no_1.id]:
+                help_dict[field_no_1.id][connector.id] = 0
+            elif help_dict[field_no_1.id][connector.id] != 0:
+                continue
+
+            if connector.obj is not None:
+                direction = direction_map.get((connector.pos.y, connector.pos.x), None)
+                field_no_2, connector_no_1_start, connector_no_2_end = find_next_field_in_direction(field_no_1, direction, direction_map)
+
+                if field_no_2 is not None:
+                    if connector_no_1_start is None or connector_no_2_end is None or connector_no_1_start is not connector:
+                        raise ValueError("Error in finding next field in direction")
+                    else:
+                        if field_no_2.id not in help_dict:
+                            help_dict[field_no_2.id] = {}
+                        elif connector_no_2_end.id not in help_dict[field_no_2.id]:
+                            help_dict[field_no_2.id][connector_no_2_end.id] = 0
+                        elif connector_no_2_end.id in help_dict[field_no_2.id] and help_dict[field_no_2.id][connector_no_2_end.id] != 0:
+                            continue
+
+                        field_no_3, connector_no_2_start, connector_no_3_end = find_next_field_in_direction(
+                            field_no_2, direction, direction_map
+                        )
+
+                        if field_no_3 is not None:
+                            if field_no_3.id not in help_dict:
+                                help_dict[field_no_3.id] = {}
+                            elif connector_no_3_end.id not in help_dict[field_no_3.id]:
+                                help_dict[field_no_3.id][connector_no_3_end.id] = 0
+                            elif connector_no_3_end.id in help_dict[field_no_3.id] and help_dict[field_no_3.id][connector_no_3_end.id] != 0:
+                                continue
+
+                            if connector_no_2_start not in help_dict[field_no_2.id]:
+                                help_dict[field_no_2.id][connector_no_2_start.id] = 0
+                            elif help_dict[field_no_2.id][connector_no_2_start.id] != 0:
+                                continue
+
+                            if connector_no_2_start is None or connector_no_3_end is None:
+                                raise ValueError("Error in finding next field in direction")
+                            else:
+                                field_no_4, _, _ = find_next_field_in_direction(field_no_3, direction, direction_map)
+                                if field_no_4 is None:
+                                    fc_map.overlay_ids(field_no_1.position, np.full_like(field_no_1.identifier_hitbox, curr_mill_id))
+                                    fc_map.overlay_ids(field_no_2.position, np.full_like(field_no_2.identifier_hitbox, curr_mill_id))
+                                    fc_map.overlay_ids(field_no_3.position, np.full_like(field_no_3.identifier_hitbox, curr_mill_id))
+
+                                    help_dict[field_no_1.id][connector.id] = curr_mill_id
+                                    help_dict[field_no_2.id][connector_no_2_end.id] = curr_mill_id
+                                    help_dict[field_no_3.id][connector_no_3_end.id] = curr_mill_id
+                                    help_dict[field_no_2.id][connector_no_2_start.id] = curr_mill_id
+
+                                    curr_mill_id += 1
+                                else:
+                                    raise ValueError("Found 4 in a row, which should not be possible in this game")
+
+    print(f"Created {curr_mill_id - 1} mills on the board.")
+    # print(fc_map)
+
     save_dict = {
         "objects": game_objects_to_dict(),
+        "mill_detection_hitbox": fc_map.to_dict(),
         "display_size": {"y": max_y + 1, "x": max_x + 1 + x_adjustment},
         "graphic_data_path": _TERMINAL_GRAPHICS_PATH,
     }

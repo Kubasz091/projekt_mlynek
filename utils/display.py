@@ -28,8 +28,52 @@ class CursesDisplay(Display):  # renders only terminal textures
 
         self.statusbar_text = "Press 'q' to exit | 'e' to move pawns | '←↑→↓' to Move"
 
-        self.cursor1 = Cursor(size, texture={"name": "cursorP1"}, id=1, position={"y": 0, "x": 8})
-        self.cursor2 = Cursor(size, texture={"name": "cursorP2"}, id=2, position={"y": 12, "x": 0})
+        self.cursor1 = Cursor(
+            size,
+            texture={"name": "cursorP1"},
+            id=1,
+            position={"y": 0, "x": 8},
+            hitbox_size=(3, 4),
+            hitbox_position=(-1, -1),
+            connections={
+                "PawnP1": {
+                    "class_name": "Cursor",
+                    "connector_data": {
+                        1: {
+                            "position": {"y": 0, "x": 0},
+                            "id": 1,
+                            "allign_offset": 1,
+                            "hitbox_position": (-1, -1),
+                            "hitbox_size": (3, 4),
+                            "obj": None,
+                        }
+                    },
+                }
+            },
+        )
+        self.cursor2 = Cursor(
+            size,
+            texture={"name": "cursorP2"},
+            id=2,
+            position={"y": 12, "x": 0},
+            hitbox_size=(3, 4),
+            hitbox_position=(-1, -1),
+            connections={
+                "PawnP2": {
+                    "class_name": "Cursor",
+                    "connector_data": {
+                        1: {
+                            "position": {"y": 0, "x": 0},
+                            "id": 1,
+                            "allign_offset": 1,
+                            "hitbox_position": (-1, -1),
+                            "hitbox_size": (3, 4),
+                            "obj": None,
+                        }
+                    },
+                }
+            },
+        )
 
         self._init_curses()
 
@@ -57,13 +101,16 @@ class CursesDisplay(Display):  # renders only terminal textures
         if key == ord("q"):
             self.running = False
         elif key == curses.KEY_UP:
-            self.cursor1.move_up()
+            self.cursor2.move_up()
         elif key == curses.KEY_DOWN:
-            self.cursor1.move_down()
+            self.cursor2.move_down()
         elif key == curses.KEY_LEFT:
-            self.cursor1.move_left()
+            self.cursor2.move_left()
         elif key == curses.KEY_RIGHT:
-            self.cursor1.move_right()
+            self.cursor2.move_right()
+
+    def input_key_pass(self):
+        return self._current_key_pressed
 
     def render_frame(self, gen_objs_acces_func=None):
         self.output.clear()

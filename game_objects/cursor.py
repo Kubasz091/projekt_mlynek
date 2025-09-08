@@ -1,7 +1,7 @@
-from game_objects.game_object import GameObject
+from game_objects.game_object import GameObject, Connectable
 
 
-class Cursor(GameObject):  # make it able to move the pawns around
+class Cursor(GameObject, Connectable):  # make it able to move the pawns around
     def __init__(self, bounds: tuple[int, int], **kwargs):
         super().__init__(**kwargs)
 

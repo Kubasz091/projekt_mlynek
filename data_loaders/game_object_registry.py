@@ -1,11 +1,11 @@
 import numpy as np
 
-from game_objects.hitboxes import HitboxMap
+from game_objects.hitboxes import CoOccurrenceMap
 
 _BOARD_SIZE = [20, 20]  # Update on load
 
 _GAME_OBJECT_REGISTRY: dict[str, dict[int, object]] = {}  # dict[class_name][id] = object
-_GAME_OBJECT_HITBOXES: dict[str, HitboxMap] = {}  # dict[class_name] = HitboxMap
+_GAME_OBJECT_HITBOXES: dict[str, CoOccurrenceMap] = {}  # dict[class_name] = CoOccurrenceMap
 
 _objs_put_away_to_reassing_id: dict[str, list[object]] = {}  # FIFO
 
@@ -61,12 +61,10 @@ def reasing_put_away_objs_ids():
 
 
 def reload_hitboxes():
-    global _GAME_OBJECT_HITBOXES
-
-    _GAME_OBJECT_HITBOXES = {}
+    _GAME_OBJECT_HITBOXES.clear()
 
     for class_name, instance_dict in _GAME_OBJECT_REGISTRY.items():
-        hitbox_map = HitboxMap(*_BOARD_SIZE)
+        hitbox_map = CoOccurrenceMap(*_BOARD_SIZE)
 
         for obj in instance_dict.values():
             if hasattr(obj, "identifier_hitbox"):

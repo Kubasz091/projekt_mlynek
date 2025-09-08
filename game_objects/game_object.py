@@ -13,7 +13,7 @@ from data_loaders import game_object_registry as gor
 from data_loaders.class_registry import register_game_object_class
 from data_loaders.terminal_texture import Texture
 from data_loaders.texture_registry import TextureRegistry, load_textures
-from game_objects.hitboxes import HitboxMap
+from game_objects.hitboxes import CoOccurrenceMap
 from utils.connection_list import ConnectorList
 from utils.position import Position2D
 from utils.validators import PositiveInt
@@ -77,7 +77,7 @@ class GameObject:
                 "__type__": self.__class__.__name__,
                 "id": self.id,
                 "position": self.position.to_dict(),
-                "texture": self.texture.to_dict(),
+                "texture": self.texture.to_dict() if self.texture else None,
             }
         )
         ### GAME OBJECT SERIALIZATION ###
@@ -111,7 +111,7 @@ class Connectable:
 
         self.hitbox_size = (0, 0)
         self.allign_offset = 0
-        self.hitbox_position = (0, 0)
+        self.hitbox_position = None
 
         super().__init__()
 
@@ -122,7 +122,12 @@ class Connectable:
         self.connections.update({class_name: ConnectorList.from_dict(info) for class_name, info in data.get("connections", {}).items()})
 
         self.allign_offset = data.get("allign_offset", 0)
-        self.hitbox_position = (-self.allign_offset, -self.allign_offset)
+
+        self.hitbox_position = data.get("hitbox_position", None)
+        if self.hitbox_position is None:
+            self.hitbox_position = (-self.allign_offset, -self.allign_offset)
+        else:
+            self.hitbox_position = tuple(self.hitbox_position)
 
         hitbox_size_data = data.get("hitbox_size", None)
 
@@ -151,7 +156,7 @@ class Connectable:
 
         for class_name, connector_list in iterator:
             if class_name not in self.connector_hitboxes:
-                self.connector_hitboxes[class_name] = HitboxMap(*self.hitbox_size)
+                self.connector_hitboxes[class_name] = CoOccurrenceMap(*self.hitbox_size)
             else:
                 self.connector_hitboxes[class_name].clear()
 
@@ -183,8 +188,9 @@ class Connectable:
             else:
                 raise ValueError("Can only connect GameObjects for now")
 
+            ignore_same_ids = class_name == self.__class__.__name__
             obj_id, _, _ = gor._GAME_OBJECT_HITBOXES[class_name].best_overlap_ids(
-                pos_look, np.full_like(self.connector_hitboxes[class_name].hitbox_array, self.id), ignore_same_ids=True
+                pos_look, np.full_like(self.connector_hitboxes[class_name].hitbox_array, self.id), ignore_same_ids=ignore_same_ids
             )
 
             if obj_id != 0:
@@ -201,7 +207,8 @@ class Connectable:
                 if obj is not None and isinstance(obj, Connectable):
                     obj_connector_id, my_connector_id, _ = obj.connector_hitboxes[self.__class__.__name__].best_overlap_ids(
                         (pos_look[0] - pos_obj_hitbox[0], pos_look[1] - pos_obj_hitbox[1]),
-                        self.connector_hitboxes[class_name].hitbox_array, ignore_same_ids=False
+                        self.connector_hitboxes[class_name].hitbox_array,
+                        ignore_same_ids=False,
                     )
 
                     if obj_connector_id != 0 and my_connector_id != 0:
@@ -379,8 +386,8 @@ if __name__ == "__main__":
     print("A->B free:", a_conn.free, "B->A free:", b_conn.free)
 
     # Hitbox sizes check (maps exist and have expected shape)
-    a.connector_hitboxes.setdefault("BObj", HitboxMap(*a.hitbox_size))
-    b.connector_hitboxes.setdefault("AObj", HitboxMap(*b.hitbox_size))
+    a.connector_hitboxes.setdefault("BObj", CoOccurrenceMap(*a.hitbox_size))
+    b.connector_hitboxes.setdefault("AObj", CoOccurrenceMap(*b.hitbox_size))
     print("A connector hitbox shape:", a.connector_hitboxes["BObj"].hitbox_array.shape)
     print("B connector hitbox shape:", b.connector_hitboxes["AObj"].hitbox_array.shape)
 

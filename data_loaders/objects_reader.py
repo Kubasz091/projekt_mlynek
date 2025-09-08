@@ -1,8 +1,9 @@
 import json
 
 from data_loaders.class_registry import resolve_game_object_class
-from data_loaders.game_object_registry import _GAME_OBJECT_REGISTRY, change_board_size, reasing_put_away_objs_ids, register_game_object
+from data_loaders.game_object_registry import _GAME_OBJECT_REGISTRY, change_board_size, reasing_put_away_objs_ids, register_game_object, reload_hitboxes
 from data_loaders.texture_registry import _TERMINAL_GRAPHICS_PATH, TextureRegistry
+from game_objects.game_lord import load_gamelord
 from game_objects.game_object import Connectable
 
 if __name__ == "__main__":
@@ -13,14 +14,10 @@ if __name__ == "__main__":
 
 
 _BOARD_SIZE_PATHS = {
-    # 3: "graphic_data/board_size_3.json",
-    # 6: "graphic_data/board_size_6.json",
-    # 9: "graphic_data/board_size_9.json",
-    # 12: "graphic_data/board_size_12.json",
-    3: "graphic_data_test/graphic_data_size_3.json",
-    6: "graphic_data_test/graphic_data_size_6.json",
-    9: "graphic_data_test/graphic_data_size_9.json",
-    12: "graphic_data_test/graphic_data_size_12.json",
+    3: "graphic_data/board_size_3.json",
+    6: "graphic_data/board_size_6.json",
+    9: "graphic_data/board_size_9.json",
+    12: "graphic_data/board_size_12.json",
 }
 
 
@@ -61,6 +58,15 @@ def load_game_objects(board_size: int):
             for obj in instance_dict.values():
                 if isinstance(obj, Connectable):
                     obj.connect_after_load()
+
+        mill_map_data = file_data.get("mill_detection_hitbox", None)
+
+        if mill_map_data is not None:
+            gl = load_gamelord(mill_map_data)
+
+            print(gl._mill_map)
+
+        reload_hitboxes()
 
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Game object file not found: {path}") from e

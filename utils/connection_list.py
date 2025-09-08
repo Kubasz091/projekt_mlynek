@@ -38,8 +38,20 @@ class Connector:
             self.id = kwargs.get("id", 0)
             self.allign_offset = kwargs.get("allign_offset", 0)
 
+            self.hitbox_position = kwargs.get("hitbox_position", None)
+            if self.hitbox_position is None:
+                self.hitbox_position = (-self.allign_offset, -self.allign_offset)
+            else:
+                self.hitbox_position = tuple(self.hitbox_position)
+
+            self.hitbox_size = kwargs.get("hitbox_size", None)
+            if self.hitbox_size is None:
+                self.hitbox_size = (1 + 2 * self.allign_offset, 1 + 2 * self.allign_offset)
+            else:
+                self.hitbox_size = tuple(self.hitbox_size)
+
             self.identifier_hitbox = np.full(
-                (1 + 2 * self.allign_offset, 1 + 2 * self.allign_offset),
+                self.hitbox_size,
                 fill_value=self.id,
                 dtype=np.uint16,
             )
