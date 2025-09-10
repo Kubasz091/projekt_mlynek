@@ -80,6 +80,8 @@ class Connector:
             "position": self.pos.to_dict(),
             "id": self.id,
             "allign_offset": self.allign_offset,
+            "hitbox_position": self.hitbox_position,
+            "hitbox_size": self.hitbox_size,
             "obj": None,
         }
         if self.obj:

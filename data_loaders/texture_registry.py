@@ -99,6 +99,10 @@ class TextureRegistry(Sequence):
 def load_textures():
     _ = TextureRegistry(_TERMINAL_GRAPHICS_PATH)
 
+def change_graphics_path(new_path: str):
+    global _TERMINAL_GRAPHICS_PATH
+    _TERMINAL_GRAPHICS_PATH = new_path
+
 
 if __name__ == "__main__":
     load_textures()

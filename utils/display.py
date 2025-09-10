@@ -26,54 +26,7 @@ class CursesDisplay(Display):  # renders only terminal textures
         self._current_size_y = 0
         self._current_size_x = 0
 
-        self.statusbar_text = "Press 'q' to exit | 'e' to move pawns | '←↑→↓' to Move"
-
-        self.cursor1 = Cursor(
-            size,
-            texture={"name": "cursorP1"},
-            id=1,
-            position={"y": 0, "x": 8},
-            hitbox_size=(3, 4),
-            hitbox_position=(-1, -1),
-            connections={
-                "PawnP1": {
-                    "class_name": "Cursor",
-                    "connector_data": {
-                        1: {
-                            "position": {"y": 0, "x": 0},
-                            "id": 1,
-                            "allign_offset": 1,
-                            "hitbox_position": (-1, -1),
-                            "hitbox_size": (3, 4),
-                            "obj": None,
-                        }
-                    },
-                }
-            },
-        )
-        self.cursor2 = Cursor(
-            size,
-            texture={"name": "cursorP2"},
-            id=2,
-            position={"y": 12, "x": 0},
-            hitbox_size=(3, 4),
-            hitbox_position=(-1, -1),
-            connections={
-                "PawnP2": {
-                    "class_name": "Cursor",
-                    "connector_data": {
-                        1: {
-                            "position": {"y": 0, "x": 0},
-                            "id": 1,
-                            "allign_offset": 1,
-                            "hitbox_position": (-1, -1),
-                            "hitbox_size": (3, 4),
-                            "obj": None,
-                        }
-                    },
-                }
-            },
-        )
+        self.statusbar_text = "Press 'q' to exit | 'e' to move pawns | 'wsad' to Move"
 
         self._init_curses()
 
@@ -88,29 +41,19 @@ class CursesDisplay(Display):  # renders only terminal textures
 
             _curr_time = time.perf_counter()
             if self.running and (_curr_time >= _next_frame):
-                self._input_procces()
+                self._get_curr_key()
+
                 self.render_frame(gen_objs_acces_func)
 
                 _next_frame = _curr_time + self._goal_refresh_time
 
         return do_render
 
-    def _input_procces(self):
-        key = self._get_curr_key()
-
-        if key == ord("q"):
-            self.running = False
-        elif key == curses.KEY_UP:
-            self.cursor2.move_up()
-        elif key == curses.KEY_DOWN:
-            self.cursor2.move_down()
-        elif key == curses.KEY_LEFT:
-            self.cursor2.move_left()
-        elif key == curses.KEY_RIGHT:
-            self.cursor2.move_right()
-
     def input_key_pass(self):
-        return self._current_key_pressed
+        return_val = self._current_key_pressed
+        self._current_key_pressed = -1
+
+        return return_val
 
     def render_frame(self, gen_objs_acces_func=None):
         self.output.clear()
@@ -118,9 +61,6 @@ class CursesDisplay(Display):  # renders only terminal textures
         if self._draw_basic_display() and gen_objs_acces_func:
             for obj in gen_objs_acces_func():
                 self.draw_texture(obj.render)
-
-            self.draw_texture(self.cursor1.render)
-            self.draw_texture(self.cursor2.render)
 
         self.output.refresh()
 
@@ -152,7 +92,7 @@ class CursesDisplay(Display):  # renders only terminal textures
             return
 
         if not text:
-            text = self.statusbar_text + f" cursor1 pos {self.cursor1.position}"
+            text = self.statusbar_text # + f" cursor1 pos {self.cursor1.position}"
 
         remaining = self._current_size_x - len(text) - 1
         fill_spaces = " " * max(0, remaining)

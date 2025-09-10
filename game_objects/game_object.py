@@ -205,25 +205,25 @@ class Connectable:
                     raise ValueError("Can only connect GameObjects for now")
 
                 if obj is not None and isinstance(obj, Connectable):
-                    obj_connector_id, my_connector_id, _ = obj.connector_hitboxes[self.__class__.__name__].best_overlap_ids(
+                    obj_connector_id, my_connector_id, _ = obj.connector_hitboxes[self.class_name].best_overlap_ids(
                         (pos_look[0] - pos_obj_hitbox[0], pos_look[1] - pos_obj_hitbox[1]),
                         self.connector_hitboxes[class_name].hitbox_array,
                         ignore_same_ids=False,
                     )
 
                     if obj_connector_id != 0 and my_connector_id != 0:
-                        obj.connections[self.__class__.__name__].connect(
+                        obj.connections[self.class_name].connect(
                             self,
                             self.connections[class_name]._dict[my_connector_id],
                             obj_connector_id,
                         )
                         obj.update_hitbox_map(
-                            self.__class__.__name__
+                            self.class_name
                         )  # could be speed up by just clearing the part previously taken by the connector
 
                         self.connections[class_name].connect(
                             obj,
-                            obj.connections[self.__class__.__name__]._dict[obj_connector_id],
+                            obj.connections[self.class_name]._dict[obj_connector_id],
                             my_connector_id,
                         )
                         self.update_hitbox_map(class_name)
@@ -231,11 +231,44 @@ class Connectable:
 
         raise ValueError("Failed to connect :(")
 
+    def disconnect(self, class_name=None, connector_id=None):
+        if class_name:
+            iterator = [class_name]
+        else:
+            iterator = self.connections.keys()
+
+        for class_name in iterator:
+            if class_name not in self.connections:
+                continue
+
+            if connector_id:
+                iterator_ids = [connector_id]
+            else:
+                iterator_ids = self.connections[class_name]._dict.keys()
+
+            for connector_id in iterator_ids:
+                if connector_id in self.connections[class_name]._dict:
+                    if self.connections[class_name]._dict[connector_id].free:
+                        continue
+
+                    self.connections[class_name]._dict[connector_id].connector.disconnect()
+                    try:
+                        self.connections[class_name]._dict[connector_id].obj.update_hitbox_map(self.class_name)
+                    except KeyError:
+                        self.connections[class_name]._dict[connector_id].obj.update_hitbox_map(self.__class__.__name__)
+
+                    self.connections[class_name]._dict[connector_id].disconnect()
+                    self.update_hitbox_map(class_name)
+
     def connect_after_load(self):
         for connector_list in self.connections.values():
             connector_list.connect_from_previous_load(self)
 
         self.update_hitbox_map()
+
+    @property
+    def class_name(self):
+        return self.__class__.__name__
 
     #
     ### Json serialization methods ###

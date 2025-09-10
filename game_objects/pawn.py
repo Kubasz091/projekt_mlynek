@@ -11,7 +11,13 @@ from game_objects.game_object import Connectable, GameObject
 
 @register_game_object_class
 class Pawn(GameObject, Connectable):
-    pass
+    @property
+    def field(self):
+        return self.connections["Field"][1]
+
+    @property
+    def class_name(self):
+        return Pawn.__name__
 
 
 @register_game_object_class
@@ -28,3 +34,5 @@ if __name__ == "__main__":
     load_textures()
 
     player1_pawn = PawnP1()
+
+    print(player1_pawn.class_name)

@@ -81,6 +81,10 @@ class Texture(Sequence):
     def color(self) -> int:
         return self._color
 
+    @color.setter
+    def color(self, value) -> None:
+        self._color = value
+
     @property
     def bold(self) -> bool:
         return self._bold

@@ -60,10 +60,14 @@ def reasing_put_away_objs_ids():
     _objs_put_away_to_reassing_id = {}
 
 
-def reload_hitboxes():
-    _GAME_OBJECT_HITBOXES.clear()
+def reload_hitboxes(class_name=None):
+    if class_name is not None:
+        iterator = [(class_name, _GAME_OBJECT_REGISTRY[class_name])]
+    else:
+        iterator = _GAME_OBJECT_REGISTRY.items()
+        _GAME_OBJECT_HITBOXES.clear()
 
-    for class_name, instance_dict in _GAME_OBJECT_REGISTRY.items():
+    for class_name, instance_dict in iterator:
         hitbox_map = CoOccurrenceMap(*_BOARD_SIZE)
 
         for obj in instance_dict.values():

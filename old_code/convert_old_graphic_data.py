@@ -86,6 +86,22 @@ for size in range(3, 15, 3):
 
     load_textures()
 
+    connection_dict = {
+        "Pawn": {
+            "class_name": "Field",
+            "connector_data": {
+                1: {
+                    "id": 1,
+                    "position": {"y": 0, "x": 0},
+                    "allign_offset": 1,
+                    "hitbox_position": (-1, -1),
+                    "hitbox_size": (5, 10),
+                    "obj": None,
+                },
+            },
+        }
+    }
+
     max_x = 0
     max_y = 0
     for pos in dot_positions:
@@ -93,7 +109,7 @@ for size in range(3, 15, 3):
             max_x = pos[1] + 5
         if pos[0] + 2 > max_y:
             max_y = pos[0] + 2
-        obj = Field(position={"y": pos[0], "x": pos[1]}, texture={"name": "dot"}, allign_offset=1)
+        obj = Field(position={"y": pos[0], "x": pos[1]}, texture={"name": "dot"}, allign_offset=1, connections=connection_dict)
         register_game_object(obj)
 
     change_board_size((max_y + 1, max_x + 1 + x_adjustment))
@@ -392,14 +408,21 @@ for size in range(3, 15, 3):
     board = Board(**board_data)  # (max_y, max_x + 10)
     register_game_object(board)
 
-    # pawn_connection_data = {
-    #     "Board": {
-    #         "class_name": "Board",
-    #         "connector_data": [
-    #             {"position": {"y": 1, "x": 2}, "obj": {"id": 1, "class_name": "Board"}},
-    #         ],
-    #     }
-    # }
+    pawn_connection_data = {
+        "Field": {
+            "class_name": "Pawn",
+            "connector_data": {
+                1: {
+                    "id": 1,
+                    "position": {"y": 0, "x": 0},
+                    "allign_offset": 1,
+                    "hitbox_position": (-1, -1),
+                    "hitbox_size": (5, 8),
+                    "obj": None,
+                },
+            },
+        }
+    }
 
     for class_name, connection_list in board.connections.items():
         for connector_id, connector in connection_list._dict.items():
@@ -407,11 +430,15 @@ for size in range(3, 15, 3):
                 obj = PawnP1(
                     position={"y": connector.pos.y - 1, "x": connector.pos.x - 2},
                     texture={"name": "pawn_player1"},
+                    allign_offset=1,
+                    connections=pawn_connection_data,
                 )
             elif class_name == "PawnP2":
                 obj = PawnP2(
                     position={"y": connector.pos.y - 1, "x": connector.pos.x - 2},
                     texture={"name": "pawn_player2"},
+                    allign_offset=1,
+                    connections=pawn_connection_data,
                 )
             else:
                 raise ValueError(f"Unknown class name in board connections: {class_name}")
