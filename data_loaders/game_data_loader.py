@@ -68,9 +68,9 @@ def load_game_objects(board_size: int):
         mill_map_data = file_data.get("mill_detection_hitbox", None)
 
         if mill_map_data is not None:
-            gl = load_gamelord(mill_map_data)
+            _ = load_gamelord(mill_map_data)
 
-            print(gl._mill_map)
+            # print(gl._mill_map)
 
         reload_hitboxes()
 

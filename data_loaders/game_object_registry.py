@@ -34,6 +34,15 @@ def register_game_object(game_object):
         _GAME_OBJECT_REGISTRY[_cls_name][game_object.id] = game_object
 
 
+def un_register_game_object(game_object):
+    _cls_name = game_object.__class__.__name__
+
+    try:
+        del _GAME_OBJECT_REGISTRY[_cls_name][game_object.id]
+    except KeyError:
+        pass
+
+
 def reasing_put_away_objs_ids():
     global _objs_put_away_to_reassing_id
 

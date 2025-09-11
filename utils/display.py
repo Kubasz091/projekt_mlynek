@@ -28,6 +28,8 @@ class CursesDisplay(Display):  # renders only terminal textures
 
         self.statusbar_text = "Press 'q' to exit | 'e' to move pawns | 'wsad' to Move"
 
+        self._current_statusbar_text = self.statusbar_text
+
         self._init_curses()
 
         self.running = True
@@ -50,10 +52,10 @@ class CursesDisplay(Display):  # renders only terminal textures
         return do_render
 
     def input_key_pass(self):
-        return_val = self._current_key_pressed
-        self._current_key_pressed = -1
+        return self._current_key_pressed
 
-        return return_val
+    def reset_key(self):
+        self._current_key_pressed = -1
 
     def render_frame(self, gen_objs_acces_func=None):
         self.output.clear()
@@ -92,7 +94,7 @@ class CursesDisplay(Display):  # renders only terminal textures
             return
 
         if not text:
-            text = self.statusbar_text # + f" cursor1 pos {self.cursor1.position}"
+            text = self._current_statusbar_text
 
         remaining = self._current_size_x - len(text) - 1
         fill_spaces = " " * max(0, remaining)

@@ -423,7 +423,6 @@ for size in range(3, 15, 3):
             },
         }
     }
-
     for class_name, connection_list in board.connections.items():
         for connector_id, connector in connection_list._dict.items():
             if class_name == "PawnP1":
