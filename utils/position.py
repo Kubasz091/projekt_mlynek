@@ -57,16 +57,28 @@ class Position2D(Sequence):
         if type(value) is Position2D:
             instance.__dict__[self.name] = value
         else:
-            instance.__dict__[self.name] = Position2D(value)
+            if self.name in instance.__dict__:
+                instance.__dict__[self.name][0] = value[0]
+                instance.__dict__[self.name][1] = value[1]
+            else:
+                instance.__dict__[self.name] = Position2D(value)
 
     # PROPERTIES
     @property
     def y(self) -> int:
         return self._y
 
+    @y.setter
+    def y(self, value: int):
+        self._y = value
+
     @property
     def x(self) -> int:
         return self._x
+
+    @x.setter
+    def x(self, value: int):
+        self._x = value
 
     def __str__(self) -> str:
         return f"({self._y}, {self._x})"
@@ -125,8 +137,7 @@ if __name__ == "__main__":
         test1.position,
     )
 
-    test1.position[0] = 1
-    test1.position[1] = 2
+    test1.position = (1, 2)
     print(
         "\nAfter changing test1.position to (1,2):"
     )  # I want it to be able to be referenced that easily for later movement of the pawn with the cursor for example

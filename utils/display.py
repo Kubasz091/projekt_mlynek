@@ -154,8 +154,8 @@ class CursesDisplay(Display):  # renders only terminal textures
         self.output.attron(curses.A_BOLD)
 
         if self._current_size_x > 4:
-            for line in _message:
-                self.output.addstr(start_y_message, start_x_message, line[: self._current_size_x])
+            for i, line in enumerate(_message):
+                self.output.addstr(start_y_message + i, start_x_message, line[: self._current_size_x])
         else:
             self.output.addstr(start_y_message, start_x_message, _message[0][: self._current_size_x])
 

@@ -231,6 +231,34 @@ class Connectable:
 
         raise ValueError("Failed to connect :(")
 
+    def connect(self, other, other_connector_id, my_connector_id):
+        if not isinstance(other, Connectable):
+            raise ValueError("Can only connect to Connectable objects")
+
+        if other.class_name not in self.connections:
+            raise ValueError(f"Cannot connect to {other.class_name}, no such connection list")
+
+        if self.class_name not in other.connections:
+            raise ValueError(f"Cannot connect from {other.class_name}, no such connection list")
+
+        if my_connector_id not in self.connections[other.class_name]._dict:
+            raise ValueError(f"Cannot connect using connector id {my_connector_id}, no such connector")
+
+        if other_connector_id not in other.connections[self.class_name]._dict:
+            raise ValueError(f"Cannot connect to connector id {other_connector_id}, no such connector")
+
+        if not self.connections[other.class_name]._dict[my_connector_id].free:
+            raise ValueError(f"Cannot connect using connector id {my_connector_id}, already connected")
+
+        if not other.connections[self.class_name]._dict[other_connector_id].free:
+            raise ValueError(f"Cannot connect to connector id {other_connector_id}, already connected")
+
+        self.connections[other.class_name].connect(other, other.connections[self.class_name]._dict[other_connector_id], my_connector_id)
+        other.connections[self.class_name].connect(self, self.connections[other.class_name]._dict[my_connector_id], other_connector_id)
+
+        self.update_hitbox_map(other.class_name)
+        other.update_hitbox_map(self.class_name)
+
     def disconnect(self, class_name=None, connector_id=None):
         if class_name:
             iterator = [class_name]
